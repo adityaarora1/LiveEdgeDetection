@@ -6,7 +6,7 @@ LiveEdgeDetection is an Android document detection ibrary. It scans documents fr
 
 # Integrating into your project
 This library is available in [JitPack.io](https://jitpack.io/) repository.
-To use it make sure to add below inside project build.gradle file ( root gradle file)
+To use it make sure to add below inside project build.gradle file (root gradle file)
 
 ```
 repositories {
