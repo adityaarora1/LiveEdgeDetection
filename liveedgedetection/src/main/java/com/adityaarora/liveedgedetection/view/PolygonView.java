@@ -313,6 +313,9 @@ public class PolygonView extends FrameLayout {
 
         private final ImageView mainPointer1;
         private final ImageView mainPointer2;
+        PointF latestPoint = new PointF();
+        PointF latestPoint1 = new PointF();
+        PointF latestPoint2 = new PointF();
 
         public MidPointTouchListenerImpl(ImageView mainPointer1, ImageView mainPointer2) {
             this.mainPointer1 = mainPointer1;
@@ -352,16 +355,36 @@ public class PolygonView extends FrameLayout {
 
                     break;
                 case MotionEvent.ACTION_DOWN:
+                    ScanActivity.allDraggedPointsStack.push(new PolygonPoints(new PointF(pointer1.getX(), pointer1.getY()),
+                            new PointF(pointer2.getX(), pointer2.getY()),
+                            new PointF(pointer3.getX(), pointer3.getY()),
+                            new PointF(pointer4.getX(), pointer4.getY())));
                     DownPT.x = event.getX();
                     DownPT.y = event.getY();
                     StartPT = new PointF(v.getX(), v.getY());
+                    latestPoint = new PointF(v.getX(), v.getY());
+                    latestPoint1 = new PointF(mainPointer1.getX(), mainPointer1.getY());
+                    latestPoint2 = new PointF(mainPointer2.getX(), mainPointer2.getY());
                     break;
                 case MotionEvent.ACTION_UP:
                     int color = 0;
-                    if (isValidShape(getPoints())) {
+                    if (isValidShape(getPoints()) && isValidPointer1() && isValidPointer2() && isValidPointer3() && isValidPointer4()) {
                         color = getResources().getColor(R.color.crop_color);
+                        latestPoint.x = v.getX();
+                        latestPoint.y = v.getY();
+                        latestPoint1.x = mainPointer1.getX();
+                        latestPoint1.y = mainPointer1.getY();
+                        latestPoint2.x = mainPointer2.getX();
+                        latestPoint2.y = mainPointer2.getY();
                     } else {
-                        color = getResources().getColor(R.color.orange);
+                        ScanActivity.allDraggedPointsStack.pop();
+                        color = getResources().getColor(R.color.crop_color);
+                        v.setX(latestPoint.x);
+                        v.setY(latestPoint.y);
+                        mainPointer1.setX(latestPoint1.x);
+                        mainPointer1.setY(latestPoint1.y);
+                        mainPointer2.setX(latestPoint2.x);
+                        mainPointer2.setY(latestPoint2.y);
                     }
                     paint.setColor(color);
                     break;
@@ -396,6 +419,14 @@ public class PolygonView extends FrameLayout {
 
     private boolean isValidPointer1() {
         return pointer1.getY() < pointer3.getY() && pointer1.getX() < pointer2.getX();
+    }
+
+    private boolean isValidMidPointerX() {
+        return midPointer24.getX() > midPointer13.getX();
+    }
+
+    private boolean isValidMidPointerY() {
+        return midPointer34.getY() > midPointer12.getY();
     }
 
     private class TouchListenerImpl implements OnTouchListener {

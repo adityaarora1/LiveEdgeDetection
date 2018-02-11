@@ -175,7 +175,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
                 captureHintLayout.setBackground(getResources().getDrawable(R.drawable.hint_white));
                 break;
             case CAPTURING_IMAGE:
-                captureHintText.setText(getResources().getString(R.string.capturing_image));
+                captureHintText.setText(getResources().getString(R.string.hold_still));
                 captureHintLayout.setBackground(getResources().getDrawable(R.drawable.hint_green));
                 break;
             case NO_MESSAGE:
