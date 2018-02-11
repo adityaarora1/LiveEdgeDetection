@@ -66,16 +66,16 @@ public class PolygonView extends FrameLayout {
         pointer3 = getImageView(0, getHeight());
         pointer4 = getImageView(getWidth(), getHeight());
         midPointer13 = getImageViewTransparent(0, getHeight() / 2);
-        //midPointer13.setOnTouchListener(new MidPointTouchListenerImpl(pointer1, pointer3));
+        midPointer13.setOnTouchListener(new MidPointTouchListenerImpl(pointer1, pointer3));
 
         midPointer12 = getImageViewTransparent(0, getWidth() / 2);
-        //midPointer12.setOnTouchListener(new MidPointTouchListenerImpl(pointer1, pointer2));
+        midPointer12.setOnTouchListener(new MidPointTouchListenerImpl(pointer1, pointer2));
 
-        midPointer34 = getImageViewTransparent(0, getHeight() / 2);
-        //midPointer34.setOnTouchListener(new MidPointTouchListenerImpl(pointer3, pointer4));
+        midPointer34 = getImageViewTransparent(0, getWidth() / 2);
+        midPointer34.setOnTouchListener(new MidPointTouchListenerImpl(pointer3, pointer4));
 
         midPointer24 = getImageViewTransparent(0, getHeight() / 2);
-        //midPointer24.setOnTouchListener(new MidPointTouchListenerImpl(pointer2, pointer4));
+        midPointer24.setOnTouchListener(new MidPointTouchListenerImpl(pointer2, pointer4));
 
         addView(pointer1);
         addView(pointer2);
@@ -96,17 +96,17 @@ public class PolygonView extends FrameLayout {
 
     private void initPaint() {
         paint = new Paint();
-        paint.setColor(getResources().getColor(R.color.crop_green));
+        paint.setColor(getResources().getColor(R.color.crop_color));
         paint.setStrokeWidth(7);
         paint.setAntiAlias(true);
 
         circleFillPaint = new Paint();
         circleFillPaint.setStyle(Paint.Style.FILL);
-        circleFillPaint.setColor(getResources().getColor(R.color.crop_green));
+        circleFillPaint.setColor(getResources().getColor(R.color.crop_color));
         circleFillPaint.setAntiAlias(true);
     }
 
-    private Map<Integer, PointF> getPoints() {
+    public Map<Integer, PointF> getPoints() {
 
         List<PointF> points = new ArrayList<>();
         points.add(new PointF(pointer1.getX(), pointer1.getY()));
@@ -225,6 +225,10 @@ public class PolygonView extends FrameLayout {
         canvas.drawCircle(pointer3.getX() + (pointer3.getWidth() / 2), pointer3.getY() + (pointer3.getHeight() / 2), radius, circleFillPaint);
         canvas.drawCircle(pointer4.getX() + (pointer4.getWidth() / 2), pointer4.getY() + (pointer4.getHeight() / 2), radius, circleFillPaint);
 
+        canvas.drawCircle(midPointer13.getX() + (midPointer13.getWidth() / 2), midPointer13.getY() + (midPointer13.getHeight() / 2), radius, circleFillPaint);
+        canvas.drawCircle(midPointer24.getX() + (midPointer24.getWidth() / 2), midPointer24.getY() + (midPointer24.getHeight() / 2), radius, circleFillPaint);
+        canvas.drawCircle(midPointer34.getX() + (midPointer34.getWidth() / 2), midPointer34.getY() + (midPointer34.getHeight() / 2), radius, circleFillPaint);
+        canvas.drawCircle(midPointer12.getX() + (midPointer12.getWidth() / 2), midPointer12.getY() + (midPointer12.getHeight() / 2), radius, circleFillPaint);
     }
 
     private Path drawOutBottomRect(Canvas canvas) {
@@ -289,7 +293,7 @@ public class PolygonView extends FrameLayout {
         imageView.setImageResource(R.drawable.circle_transparent);
         imageView.setX(x);
         imageView.setY(y);
-        imageView.setOnTouchListener(new TouchListenerImpl());
+//        imageView.setOnTouchListener(new MidPointTouchListenerImpl());
         return imageView;
     }
 
@@ -346,7 +350,7 @@ public class PolygonView extends FrameLayout {
                 case MotionEvent.ACTION_UP:
                     int color = 0;
                     if (isValidShape(getPoints())) {
-                        color = getResources().getColor(R.color.crop_green);
+                        color = getResources().getColor(R.color.crop_color);
                     } else {
                         color = getResources().getColor(R.color.orange);
                     }
@@ -416,12 +420,12 @@ public class PolygonView extends FrameLayout {
                 case MotionEvent.ACTION_UP:
                     int color = 0;
                     if (isValidShape(getPoints()) && isValidPointer4() && isValidPointer3() && isValidPointer2() && isValidPointer1()) {
-                        color = getResources().getColor(R.color.crop_green);
+                        color = getResources().getColor(R.color.crop_color);
                         latestPoint.x = v.getX();
                         latestPoint.y = v.getY();
                     } else {
                         ScanActivity.allDraggedPointsStack.pop();
-                        color = getResources().getColor(R.color.crop_green);
+                        color = getResources().getColor(R.color.crop_color);
                         v.setX(latestPoint.x);
                         v.setY(latestPoint.y);
                     }

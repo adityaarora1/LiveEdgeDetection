@@ -9,8 +9,8 @@
     <color name="green">#26d84c</color>
 
     <color name= "orange">#ff9c00</color>
-    <color name="edge_green">#26d88c</color>
-    <color name="crop_green">#26d88c</color>
+    <color name="edge_color">#00d1fe</color>
+    <color name="crop_color">#00d1fe</color>
 
     <color name="colorBlackThirtyFivePercentAlpha">#59000000</color>
 </resources>

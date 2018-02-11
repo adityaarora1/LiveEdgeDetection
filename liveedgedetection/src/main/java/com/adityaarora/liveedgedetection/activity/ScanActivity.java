@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -14,8 +15,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +30,7 @@ import com.adityaarora.liveedgedetection.enums.ScanHint;
 import com.adityaarora.liveedgedetection.interfaces.IScanner;
 import com.adityaarora.liveedgedetection.util.ScanUtils;
 import com.adityaarora.liveedgedetection.view.PolygonPoints;
+import com.adityaarora.liveedgedetection.view.PolygonView;
 import com.adityaarora.liveedgedetection.view.ProgressDialogFragment;
 import com.adityaarora.liveedgedetection.view.Quadrilateral;
 import com.adityaarora.liveedgedetection.view.ScanCanvasView;
@@ -34,7 +39,12 @@ import com.adityaarora.liveedgedetection.view.ScanSurfaceView;
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import static android.view.View.GONE;
@@ -42,7 +52,7 @@ import static android.view.View.GONE;
 /**
  * This class initiates camera and detects edges on live view
  */
-public class ScanActivity extends AppCompatActivity implements IScanner {
+public class ScanActivity extends AppCompatActivity implements IScanner, View.OnClickListener {
     private static final String TAG = ScanActivity.class.getSimpleName();
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 101;
@@ -57,6 +67,11 @@ public class ScanActivity extends AppCompatActivity implements IScanner {
     private LinearLayout captureHintLayout;
 
     public final static Stack<PolygonPoints> allDraggedPointsStack = new Stack<>();
+    private PolygonView polygonView;
+    private ImageView cropImageView;
+    private ImageView cropAcceptBtn;
+    private Bitmap copyBitmap;
+    private FrameLayout cropLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +87,12 @@ public class ScanActivity extends AppCompatActivity implements IScanner {
         scanCanvasView      = findViewById(R.id.scan_canvas);
         captureHintLayout   = findViewById(R.id.capture_hint_layout);
         captureHintText     = findViewById(R.id.capture_hint_text);
+        polygonView         = findViewById(R.id.polygon_view);
+        cropImageView       = findViewById(R.id.crop_image_view);
+        cropAcceptBtn       = findViewById(R.id.crop_accept_btn);
+        cropLayout          = findViewById(R.id.crop_layout);
 
+        cropAcceptBtn.setOnClickListener(this);
         checkCameraPermissions();
     }
 
@@ -180,38 +200,53 @@ public class ScanActivity extends AppCompatActivity implements IScanner {
 
     @Override
     public void onPictureClicked(final Bitmap bitmap) {
-        showProgressDialog(getResources().getString(R.string.loading));
-
         try {
-            Mat originalMat = new Mat(bitmap.getHeight(), bitmap.getWidth(), CvType.CV_8UC1);
-            Utils.bitmapToMat(bitmap, originalMat);
-            Bitmap croppedBitmap = bitmap;
+            copyBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+
+            int height  = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getHeight();
+            int width   = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getWidth();
+
+            copyBitmap = ScanUtils.resizeToScreenContentSize(copyBitmap, width, height);
+            Mat originalMat = new Mat(copyBitmap.getHeight(), copyBitmap.getWidth(), CvType.CV_8UC1);
+            Utils.bitmapToMat(copyBitmap, originalMat);
+            ArrayList<PointF> points;
+            Map<Integer, PointF> pointFs = new HashMap<>();
             try {
                 Quadrilateral quad = ScanUtils.detectLargestQuadrilateral(originalMat);
                 if (null != quad) {
-                    croppedBitmap = ScanUtils.enhanceReceipt(bitmap, quad.points[0], quad.points[1], quad.points[3], quad.points[2]);
+                    double resultArea = Math.abs(Imgproc.contourArea(quad.contour));
+                    double previewArea = originalMat.rows() * originalMat.cols();
+                    if(resultArea > previewArea * 0.08) {
+                        points = new ArrayList<>();
+                        points.add(new PointF((float) quad.points[0].x, (float) quad.points[0].y));
+                        points.add(new PointF((float) quad.points[1].x, (float) quad.points[1].y));
+                        points.add(new PointF((float) quad.points[3].x, (float) quad.points[3].y));
+                        points.add(new PointF((float) quad.points[2].x, (float) quad.points[2].y));
+                    } else {
+                        points = ScanUtils.getPolygonDefaultPoints(copyBitmap);
+                    }
+
+                } else {
+                    points = ScanUtils.getPolygonDefaultPoints(copyBitmap);
                 }
+
+                int index = -1;
+                for (PointF pointF : points) {
+                    pointFs.put(++index, pointF);
+                }
+
+                polygonView.setPoints(pointFs);
+                int padding = (int) getResources().getDimension(R.dimen.scan_padding);
+                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(copyBitmap.getWidth() + 2 * padding, copyBitmap.getHeight() + 2 * padding);
+                layoutParams.gravity = Gravity.CENTER;
+                polygonView.setLayoutParams(layoutParams);
+                cropLayout.setVisibility(View.VISIBLE);
+
+                cropImageView.setImageBitmap(copyBitmap);
+                cropImageView.setScaleType(ImageView.ScaleType.FIT_XY);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage(), e);
             }
-
-            Intent data = new Intent();
-
-            String[] mParams;
-            mParams = ScanUtils.saveToInternalMemory(croppedBitmap, ScanConstants.IMAGE_DIR,
-                    ScanConstants.IMAGE_NAME, ScanActivity.this, 90);
-            String mFilePath = mParams[0];
-            data.putExtra(ScanConstants.SCANNED_RESULT, mFilePath);
-            setResult(Activity.RESULT_OK, data);
-            bitmap.recycle();
-            System.gc();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    dismissDialog();
-                    finish();
-                }
-            });
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
@@ -234,5 +269,29 @@ public class ScanActivity extends AppCompatActivity implements IScanner {
 
     static {
         System.loadLibrary(mOpenCvLibrary);
+    }
+
+    @Override
+    public void onClick(View view) {
+        Map<Integer, PointF> points = polygonView.getPoints();
+
+        Bitmap croppedBitmap;
+
+        if (ScanUtils.isScanPointsValid(points)) {
+            Point point1 = new Point(points.get(0).x, points.get(0).y);
+            Point point2 = new Point(points.get(1).x, points.get(1).y);
+            Point point3 = new Point(points.get(2).x, points.get(2).y);
+            Point point4 = new Point(points.get(3).x, points.get(3).y);
+            croppedBitmap = ScanUtils.enhanceReceipt(copyBitmap, point1, point2, point3, point4);
+        } else {
+            croppedBitmap = copyBitmap;
+        }
+
+        String path = ScanUtils.saveToInternalMemory(croppedBitmap, ScanConstants.IMAGE_DIR,
+                ScanConstants.IMAGE_NAME, ScanActivity.this, 90)[0];
+        setResult(Activity.RESULT_OK, new Intent().putExtra(ScanConstants.SCANNED_RESULT, path));
+        //bitmap.recycle();
+        System.gc();
+        finish();
     }
 }

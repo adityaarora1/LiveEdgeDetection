@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_size_18">18sp</dimen>
+    <dimen name="scan_padding">18dp</dimen>
 </resources>
