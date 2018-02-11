@@ -57,6 +57,14 @@ startActivityForResult(new Intent(this, ScanActivity.class), REQUEST_CODE);
 String filePath = data.getExtras().getString(ScanConstants.SCANNED_RESULT);
 Bitmap baseBitmap = ScanUtils.decodeBitmapFromFile(filePath, ScanConstants.IMAGE_NAME);
 ```
+3. Display the image using **TouchImageView**
+```
+<com.adityaarora.liveedgedetection.view.TouchImageView
+        android:id="@+id/scanned_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="center" />
+```
 
 # Help
 **Versioning policy**
