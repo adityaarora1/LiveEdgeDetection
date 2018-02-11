@@ -6,9 +6,8 @@ LiveEdgeDetection is an Android document detection library built on top of OpenC
 
 **It works best with a dark background.**
 
-# Docs
-
-[JavaDoc](https://adityaarora1.github.io/LiveEdgeDetection/docs)
+# JavaDocs
+You can browse the [JavaDocs for the latest release](https://adityaarora1.github.io/LiveEdgeDetection/docs)
 
 # Download apk
 Try the [sample app](https://drive.google.com/file/d/1sO26O4-1-2XAX16czREx7SiiCD8-4ecU/view?usp=sharing)
