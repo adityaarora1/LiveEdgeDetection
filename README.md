@@ -2,12 +2,23 @@
 
 # LiveEdgeDetection
 
-LiveEdgeDetection is an Android document detection library. It scans documents from camera live mode and allows you to adjust crop using the selected 4 edges and performs perspective transformation of the cropped image.
+LiveEdgeDetection is an Android document detection library built on top of openCV. It scans documents from camera live mode and allows you to adjust crop using the selected 4 edges and performs perspective transformation of the cropped image.
+
+It works best in a dark background.
 
 # Docs
 
 [JavaDoc](https://adityaarora1.github.io/LiveEdgeDetection/docs)
 
+# Screenshots
+
+![Use darker bg](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/use_darker_bg.png)
+![Move closer](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/move_closer.png)
+![Move away](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/move_away.png)
+![Adjust angle](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/adjust_angle.png)
+![Hold still](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/hold_still.png)
+![Adjust crop](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/adjust_crop.png)
+![Result](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/cropped.png)
 
 # Integrating into your project
 This library is available in [JitPack.io](https://jitpack.io/) repository.
