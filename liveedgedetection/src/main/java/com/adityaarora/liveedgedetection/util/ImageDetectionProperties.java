@@ -3,6 +3,9 @@ package com.adityaarora.liveedgedetection.util;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 
+/**
+ * This class holds configuration of detected edges
+ */
 public class ImageDetectionProperties {
     private final double previewWidth;
     private final double previewHeight;

@@ -6,8 +6,6 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -25,10 +23,8 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -271,13 +267,6 @@ public class ScanUtils {
         return output;
     }
 
-    public static Uri getUri(Context context, Bitmap bitmap) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "Title", null);
-        return Uri.parse(path);
-    }
-
     public static String[] saveToInternalMemory(Bitmap bitmap, String mFileDirectory, String
             mFileName, Context mContext, int mQuality) {
 
@@ -300,9 +289,8 @@ public class ScanUtils {
     private static File getBaseDirectoryFromPathString(String mPath, Context mContext) {
 
         ContextWrapper mContextWrapper = new ContextWrapper(mContext);
-        File mBaseDirectory = mContextWrapper.getDir(mPath, Context.MODE_PRIVATE);
 
-        return mBaseDirectory;
+        return mContextWrapper.getDir(mPath, Context.MODE_PRIVATE);
     }
 
     public static Bitmap decodeBitmapFromFile(String path, String imageName) {
@@ -310,10 +298,8 @@ public class ScanUtils {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-        Bitmap mBitmap = BitmapFactory.decodeFile(new File(path, imageName).getAbsolutePath(),
+        return BitmapFactory.decodeFile(new File(path, imageName).getAbsolutePath(),
                 options);
-
-        return mBitmap;
     }
 
     /*
@@ -328,7 +314,7 @@ public class ScanUtils {
     }
 
     public static Bitmap loadEfficientBitmap(byte[] data, int width, int height) {
-        Bitmap bmp = null;
+        Bitmap bmp;
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -344,7 +330,7 @@ public class ScanUtils {
         return bmp;
     }
 
-    public static int calculateInSampleSize(
+    private static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;

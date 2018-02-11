@@ -12,7 +12,7 @@ import android.view.KeyEvent;
 @SuppressLint("ValidFragment")
 public class ProgressDialogFragment extends DialogFragment {
 
-	public String message;
+	private final String message;
 
 	public ProgressDialogFragment(String message) {
 		this.message = message;
@@ -32,10 +32,7 @@ public class ProgressDialogFragment extends DialogFragment {
 			public boolean onKey(DialogInterface dialog, int keyCode,
                                  KeyEvent event) {
 
-				if (keyCode == KeyEvent.KEYCODE_BACK) {
-					return true;
-				}
-				return false; 
+				return keyCode == KeyEvent.KEYCODE_BACK;
 			}
  
 		};

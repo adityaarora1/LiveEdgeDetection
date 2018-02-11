@@ -3,14 +3,14 @@ package com.adityaarora.liveedgedetection.view;
 import android.graphics.PointF;
 
 /**
- * Created by Aditya_Arora03 on 10/23/2017.
+ * This class holds polygon coordinates
  */
 
 public class PolygonPoints {
-    PointF topLeftPoint;
-    PointF topRightPoint;
-    PointF bottomLeftPoint;
-    PointF bottomRightPoint;
+    private final PointF topLeftPoint;
+    private final PointF topRightPoint;
+    private final PointF bottomLeftPoint;
+    private final PointF bottomRightPoint;
 
     public PolygonPoints(PointF topLeftPoint, PointF topRightPoint, PointF bottomLeftPoint, PointF bottomRightPoint) {
         this.topLeftPoint = topLeftPoint;

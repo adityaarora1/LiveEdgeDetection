@@ -38,6 +38,9 @@ import android.widget.Scroller;
 
 import com.adityaarora.liveedgedetection.util.ScanUtils;
 
+/**
+ * This class provides pinch to zoom capability to an image
+ */
 public class TouchImageView extends android.support.v7.widget.AppCompatImageView {
 	
 	private static final String DEBUG = "DEBUG";
@@ -63,7 +66,7 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
     //
 	private Matrix matrix, prevMatrix;
 
-    private static enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM };
+    private enum State { NONE, DRAG, ZOOM, FLING, ANIMATE_ZOOM }
     private State state;
 
     private float minScale;
@@ -810,15 +813,12 @@ public class TouchImageView extends android.support.v7.widget.AppCompatImageView
 
         @Override
         public boolean onDoubleTapEvent(MotionEvent e) {
-            if(doubleTapListener != null) {
-            	return doubleTapListener.onDoubleTapEvent(e);
-            }
-            return false;
+            return doubleTapListener != null && doubleTapListener.onDoubleTapEvent(e);
         }
     }
     
     public interface OnTouchImageViewListener {
-    	public void onMove();
+    	void onMove();
     }
     
     /**

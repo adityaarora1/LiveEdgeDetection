@@ -12,7 +12,6 @@ import android.graphics.drawable.shapes.PathShape;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -291,13 +290,12 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 if (Math.round((float) millisUntilFinished / 1000.0f) != secondsLeft) {
                     secondsLeft = Math.round((float) millisUntilFinished / 1000.0f);
                 }
-                Log.v(TAG, " " + millisUntilFinished / 1000);
+                Log.v(TAG, "" + millisUntilFinished / 1000);
                 switch (secondsLeft) {
                     case 1:
                         autoCapture(scanHint);
                         break;
                     default:
-                        Log.v("HI", secondsLeft + "");
                         break;
                 }
             }
@@ -383,7 +381,8 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         public void onShutter() {
             if (context != null) {
                 AudioManager mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-                mAudioManager.playSoundEffect(AudioManager.FLAG_PLAY_SOUND);
+                if(null != mAudioManager)
+                    mAudioManager.playSoundEffect(AudioManager.FLAG_PLAY_SOUND);
             }
         }
     };

@@ -1,7 +1,7 @@
 package com.adityaarora.liveedgedetection.constants;
 
 /**
- * Created by Aditya_Arora03 on 2/11/2018.
+ * This class defines constants
  */
 
 public class ScanConstants {

@@ -3,6 +3,7 @@ package com.adityaarora.liveedgedetection.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -20,12 +21,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import android.graphics.Path;
 
+/**
+ * This class defines polygon for cropping
+ */
 public class PolygonView extends FrameLayout {
 
     private static final String TAG = PolygonView.class.getSimpleName();
-    protected Context context;
+    private final Context context;
     private Paint paint;
     private ImageView pointer1;
     private ImageView pointer2;
@@ -103,9 +106,9 @@ public class PolygonView extends FrameLayout {
         circleFillPaint.setAntiAlias(true);
     }
 
-    public Map<Integer, PointF> getPoints() {
+    private Map<Integer, PointF> getPoints() {
 
-        List<PointF> points = new ArrayList<PointF>();
+        List<PointF> points = new ArrayList<>();
         points.add(new PointF(pointer1.getX(), pointer1.getY()));
         points.add(new PointF(pointer2.getX(), pointer2.getY()));
         points.add(new PointF(pointer3.getX(), pointer3.getY()));
@@ -114,7 +117,7 @@ public class PolygonView extends FrameLayout {
         return getOrderedPoints(points);
     }
 
-    public Map<Integer, PointF> getOrderedPoints(List<PointF> points) {
+    private Map<Integer, PointF> getOrderedPoints(List<PointF> points) {
 
         PointF centerPoint = new PointF();
         int size = points.size();
@@ -292,11 +295,11 @@ public class PolygonView extends FrameLayout {
 
     private class MidPointTouchListenerImpl implements OnTouchListener {
 
-        PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
+        final PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
         PointF StartPT = new PointF(); // Record Start Position of 'img'
 
-        private ImageView mainPointer1;
-        private ImageView mainPointer2;
+        private final ImageView mainPointer1;
+        private final ImageView mainPointer2;
 
         public MidPointTouchListenerImpl(ImageView mainPointer1, ImageView mainPointer2) {
             this.mainPointer1 = mainPointer1;
@@ -362,29 +365,29 @@ public class PolygonView extends FrameLayout {
         return super.onTouchEvent(event);
     }
 
-    public boolean isValidShape(Map<Integer, PointF> pointFMap) {
+    private boolean isValidShape(Map<Integer, PointF> pointFMap) {
         return pointFMap.size() == 4;
     }
 
-    public boolean isValidPointer4() {
+    private boolean isValidPointer4() {
         return pointer4.getY() > pointer2.getY() && pointer4.getX() > pointer3.getX();
     }
 
-    public boolean isValidPointer3() {
+    private boolean isValidPointer3() {
         return pointer3.getY() > pointer1.getY() && pointer3.getX() < pointer4.getX();
     }
 
-    public boolean isValidPointer2() {
+    private boolean isValidPointer2() {
         return pointer2.getY() < pointer4.getY() && pointer2.getX() > pointer1.getX();
     }
 
-    public boolean isValidPointer1() {
+    private boolean isValidPointer1() {
         return pointer1.getY() < pointer3.getY() && pointer1.getX() < pointer2.getX();
     }
 
     private class TouchListenerImpl implements OnTouchListener {
 
-        PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
+        final PointF DownPT = new PointF(); // Record Mouse Position When Pressed Down
         PointF StartPT = new PointF(); // Record Start Position of 'img'
         PointF latestPoint = new PointF();
 

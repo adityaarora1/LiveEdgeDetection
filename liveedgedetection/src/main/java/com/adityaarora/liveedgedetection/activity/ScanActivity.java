@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -40,6 +39,9 @@ import java.util.Stack;
 
 import static android.view.View.GONE;
 
+/**
+ * This class initiates camera and detects edges on live view
+ */
 public class ScanActivity extends AppCompatActivity implements IScanner {
     private static final String TAG = ScanActivity.class.getSimpleName();
 
@@ -54,7 +56,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner {
     private TextView captureHintText;
     private LinearLayout captureHintLayout;
 
-    public static Stack<PolygonPoints> allDraggedPointsStack = new Stack<>();
+    public final static Stack<PolygonPoints> allDraggedPointsStack = new Stack<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,7 +217,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner {
         }
     }
 
-    protected synchronized void showProgressDialog(String message) {
+    private synchronized void showProgressDialog(String message) {
         if (progressDialogFragment != null && progressDialogFragment.isVisible()) {
             // Before creating another loading dialog, close all opened loading dialogs (if any)
             progressDialogFragment.dismissAllowingStateLoss();
@@ -226,7 +228,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner {
         progressDialogFragment.show(fm, ProgressDialogFragment.class.toString());
     }
 
-    protected synchronized void dismissDialog() {
+    private synchronized void dismissDialog() {
         progressDialogFragment.dismissAllowingStateLoss();
     }
 
