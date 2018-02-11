@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorBlackFortyPercentAlpha">#66000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="red">#ff2600</color>
+    <color name="green">#26d84c</color>
+
+    <color name= "orange">#ff9c00</color>
+    <color name="edge_green">#26d88c</color>
+    <color name="crop_green">#26d88c</color>
+
+    <color name="colorBlackThirtyFivePercentAlpha">#59000000</color>
+</resources>
