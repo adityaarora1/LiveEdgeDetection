@@ -10,6 +10,9 @@ It works best with a dark background.
 
 [JavaDoc](https://adityaarora1.github.io/LiveEdgeDetection/docs)
 
+# Download apk
+Try the [sample app](https://drive.google.com/file/d/1sO26O4-1-2XAX16czREx7SiiCD8-4ecU/view?usp=sharing)
+
 # Screenshots
 
 ![Use darker bg](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/use_darker_bg.png)
