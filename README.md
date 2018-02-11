@@ -81,6 +81,8 @@ Fork this project and start working on your own feature branch. When you're done
 
 # License
 ```
+Copyright 2018 Aditya Arora.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
