@@ -25,7 +25,7 @@ Try the [sample app](https://drive.google.com/file/d/1sO26O4-1-2XAX16czREx7SiiCD
 
 # Integrating into your project
 This library is available in [JitPack.io](https://jitpack.io/) repository.
-To use it make sure to add the below inside project build.gradle file (root gradle file)
+To use it, make sure to add the below inside root build.gradle file
 
 ```
 allprojects {
@@ -36,11 +36,11 @@ allprojects {
 }
 ```
 
-and the repository's url is added to the build.gradle file in your app.
+and add the repository's url to the app's build.gradle file.
 
 ```
 dependencies {
-   compile 'com.github.adityaarora1:LiveEdgeDetection:1.0.0'
+   compile 'com.github.adityaarora1:LiveEdgeDetection:1.0.6'
    
     // Other dependencies your app might use
 }
