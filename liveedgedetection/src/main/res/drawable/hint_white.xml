@@ -7,10 +7,10 @@
         android:left="10dp"
         android:right="10dp"
         android:top="10dp" />
-    <solid android:color="@color/colorBlackFortyPercentAlpha" />
+    <solid android:color="@color/crop_color" />
 
     <stroke
         android:width="2dp"
-        android:color="@color/colorBlackFortyPercentAlpha" />
+        android:color="@color/crop_color" />
 
 </shape>

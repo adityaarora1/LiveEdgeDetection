@@ -2,7 +2,7 @@
     <string name="app_name">Live Edge Detection</string>
     <string name="camera_activity_permission_denied_toast">Please go to app settings and grant camera permission</string>
 
-    <string name="finding_rect">Scanning…</string>
+    <string name="finding_rect">Use darker background…</string>
     <string name="move_away">Move away</string>
     <string name="move_closer">Move closer</string>
     <string name="adjust_angle">Adjust angle</string>

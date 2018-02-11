@@ -274,7 +274,7 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 " Area: " + String.valueOf(area) +
                 " Label: " + scanHint.toString());
 
-        border.setStrokeWidth(7);
+        border.setStrokeWidth(12);
         iScanner.displayHint(scanHint);
         setPaintAndBorder(scanHint, paint, border);
         scanCanvasView.clear();
