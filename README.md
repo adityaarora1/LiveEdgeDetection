@@ -4,6 +4,11 @@
 
 LiveEdgeDetection is an Android document detection library. It scans documents from camera live mode and allows you to adjust crop using the selected 4 edges and performs perspective transformation of the cropped image.
 
+# Docs
+
+[Javadocs](https://adityaarora1.github.io/LiveEdgeDetection/docs)
+
+
 # Integrating into your project
 This library is available in [JitPack.io](https://jitpack.io/) repository.
 To use it make sure to add the below inside project build.gradle file (root gradle file)
