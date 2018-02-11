@@ -1,9 +1,10 @@
-# LiveEdgeDetection
+# LiveEdgeDetection [![Release](https://jitpack.io/v/User/Repo.svg)]
+                    (https://jitpack.io/#adityaarora1/LiveEdgeDetection)
 
 LiveEdgeDetection is an Android document detection ibrary. It scans documents from camera live mode and allows you to adjust crop using from the selected 4 edges and performs perspective transformation of the cropped image.
 
 # Integrating into your project
-This library is available in JitPack.io repository. To use it make sure that repository's url is added to the build.gradle file in your app:
+This library is available in [JitPack.io](https://jitpack.io/) repository. To use it make sure that repository's url is added to the build.gradle file in your app:
 
 ```
 repositories {
