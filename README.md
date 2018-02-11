@@ -9,9 +9,11 @@ This library is available in [JitPack.io](https://jitpack.io/) repository.
 To use it make sure to add below inside project build.gradle file (root gradle file)
 
 ```
-repositories {
-    mavenCentral()
-    maven { url "https://jitpack.io" }
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
 }
 ```
 
