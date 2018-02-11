@@ -6,6 +6,6 @@
     <string name="move_away">Move away</string>
     <string name="move_closer">Move closer</string>
     <string name="adjust_angle">Adjust angle</string>
-    <string name="capturing_image">Capturing image…</string>
-    <string name="loading">Loading…</string>
+    <string name="capturing_image">Hold still…</string>
+    <string name="capturing">Capturing image…</string>
 </resources>

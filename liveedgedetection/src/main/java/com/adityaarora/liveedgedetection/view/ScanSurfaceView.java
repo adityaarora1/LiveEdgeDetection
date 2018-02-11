@@ -285,7 +285,7 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private void scheduleAutoCapture(final ScanHint scanHint) {
         isAutoCaptureScheduled = true;
         secondsLeft = 0;
-        autoCaptureTimer = new CountDownTimer(3000, 100) {
+        autoCaptureTimer = new CountDownTimer(2000, 100) {
             public void onTick(long millisUntilFinished) {
                 if (Math.round((float) millisUntilFinished / 1000.0f) != secondsLeft) {
                     secondsLeft = Math.round((float) millisUntilFinished / 1000.0f);

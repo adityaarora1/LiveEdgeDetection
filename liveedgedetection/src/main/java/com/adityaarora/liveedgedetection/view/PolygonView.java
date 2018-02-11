@@ -160,6 +160,15 @@ public class PolygonView extends FrameLayout {
 
         pointer4.setX(pointFMap.get(3).x);
         pointer4.setY(pointFMap.get(3).y);
+
+        midPointer13.setX(pointer3.getX() - ((pointer3.getX() - pointer1.getX()) / 2));
+        midPointer13.setY(pointer3.getY() - ((pointer3.getY() - pointer1.getY()) / 2));
+        midPointer24.setX(pointer4.getX() - ((pointer4.getX() - pointer2.getX()) / 2));
+        midPointer24.setY(pointer4.getY() - ((pointer4.getY() - pointer2.getY()) / 2));
+        midPointer34.setX(pointer4.getX() - ((pointer4.getX() - pointer3.getX()) / 2));
+        midPointer34.setY(pointer4.getY() - ((pointer4.getY() - pointer3.getY()) / 2));
+        midPointer12.setX(pointer2.getX() - ((pointer2.getX() - pointer1.getX()) / 2));
+        midPointer12.setY(pointer2.getY() - ((pointer2.getY() - pointer1.getY()) / 2));
     }
 
     public void resetPoints(PolygonPoints polygonPoints) {
@@ -290,7 +299,7 @@ public class PolygonView extends FrameLayout {
         ImageView imageView = new ImageView(context);
         LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         imageView.setLayoutParams(layoutParams);
-        imageView.setImageResource(R.drawable.circle_transparent);
+        imageView.setImageResource(R.drawable.circle);
         imageView.setX(x);
         imageView.setY(y);
 //        imageView.setOnTouchListener(new MidPointTouchListenerImpl());
