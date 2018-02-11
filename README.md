@@ -60,7 +60,7 @@ limitations under the License.
 
 # Donation
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/adityaarora1)
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/adityaarora1)
-![Paypal](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/paypal_q.png)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/adityaarora1)  [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/adityaarora1)
+
+![Paypal](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/paypal_qr.gif)
 
