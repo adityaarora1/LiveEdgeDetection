@@ -6,7 +6,7 @@ LiveEdgeDetection is an Android document detection library. It scans documents f
 
 # Docs
 
-[Javadocs](https://adityaarora1.github.io/LiveEdgeDetection/docs)
+[JavaDoc](https://adityaarora1.github.io/LiveEdgeDetection/docs)
 
 
 # Integrating into your project
