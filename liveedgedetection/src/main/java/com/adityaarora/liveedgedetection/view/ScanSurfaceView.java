@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.drawable.shapes.PathShape;
 import android.hardware.Camera;
 import android.media.AudioManager;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -51,6 +52,9 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private List<Camera.Size> pictureSizeList;
 
     private final IScanner iScanner;
+    private CountDownTimer autoCaptureTimer;
+    private int secondsLeft;
+    private boolean isAutoCaptureScheduled;
 
     public ScanSurfaceView(Context context, ScanCanvasView scanCanvasView,
                            IScanner iScanner) {
@@ -138,7 +142,7 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         if (camera != null) {
             // Call stopPreview() to stop updating the preview surface.
             camera.stopPreview();
-
+            camera.setPreviewCallback(null);
             // Important: Call release() to release the camera for use by other
             // applications. Applications should release the camera immediately
             // during onPause() and re-open() it during onResume()).
@@ -232,20 +236,26 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         if(imgDetectionPropsObj.isDetectedAreaBeyondLimits()) {
             scanHint = ScanHint.FIND_RECT;
+            cancelAutoCapture();
         } else if (imgDetectionPropsObj.isDetectedAreaBelowLimits()) {
+            cancelAutoCapture();
             if(imgDetectionPropsObj.isEdgeTouching()) {
                 scanHint = ScanHint.MOVE_AWAY;
             } else {
                 scanHint = ScanHint.MOVE_CLOSER;
             }
         } else if(imgDetectionPropsObj.isDetectedHeightAboveLimit()) {
+            cancelAutoCapture();
             scanHint = ScanHint.MOVE_AWAY;
         } else if(imgDetectionPropsObj.isDetectedWidthAboveLimit() || imgDetectionPropsObj.isDetectedAreaAboveLimit()) {
+            cancelAutoCapture();
             scanHint = ScanHint.MOVE_AWAY;
         } else {
             if (imgDetectionPropsObj.isEdgeTouching()) {
+                cancelAutoCapture();
                 scanHint = ScanHint.MOVE_AWAY;
             } else if (imgDetectionPropsObj.isAngleNotCorrect(approx)) {
+                cancelAutoCapture();
                 scanHint = ScanHint.ADJUST_ANGLE;
             } else {
                 Log.i(TAG, "GREEN" + "(resultWidth/resultHeight) > 4: " + (resultWidth / resultHeight) +
@@ -255,16 +265,9 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 scanHint = ScanHint.CAPTURING_IMAGE;
                 iScanner.clearAndInvalidateCanvas();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(ScanHint.CAPTURING_IMAGE.equals(scanHint)) {
-                            camera.setPreviewCallback(null);
-                            camera.takePicture(mShutterCallBack, null, pictureCallback);
-                            iScanner.displayHint(ScanHint.NO_MESSAGE);
-                        }
-                    }
-                },1000);
+                if(!isAutoCaptureScheduled) {
+                    scheduleAutoCapture(scanHint);
+                }
             }
         }
         Log.i(TAG,"Preview Area 95%: " + 0.95 * previewArea +
@@ -278,6 +281,49 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         scanCanvasView.clear();
         scanCanvasView.addShape(newBox, paint, border);
         iScanner.invalidateCanvas();
+    }
+
+    private void scheduleAutoCapture(final ScanHint scanHint) {
+        isAutoCaptureScheduled = true;
+        secondsLeft = 0;
+        autoCaptureTimer = new CountDownTimer(3000, 100) {
+            public void onTick(long millisUntilFinished) {
+                if (Math.round((float) millisUntilFinished / 1000.0f) != secondsLeft) {
+                    secondsLeft = Math.round((float) millisUntilFinished / 1000.0f);
+                }
+                Log.v(TAG, " " + millisUntilFinished / 1000);
+                switch (secondsLeft) {
+                    case 1:
+                        autoCapture(scanHint);
+                        break;
+                    default:
+                        Log.v("HI", secondsLeft + "");
+                        break;
+                }
+            }
+
+            public void onFinish() {
+                isAutoCaptureScheduled = false;
+            }
+        };
+        autoCaptureTimer.start();
+    }
+
+    private void autoCapture(ScanHint scanHint) {
+        if(ScanHint.CAPTURING_IMAGE.equals(scanHint)) {
+            camera.setPreviewCallback(null);
+            camera.takePicture(mShutterCallBack, null, pictureCallback);
+            iScanner.displayHint(ScanHint.NO_MESSAGE);
+        }
+    }
+
+    private void cancelAutoCapture() {
+        if(isAutoCaptureScheduled) {
+            isAutoCaptureScheduled = false;
+            if (null != autoCaptureTimer) {
+                autoCaptureTimer.cancel();
+            }
+        }
     }
 
     private void showFindingReceiptHint() {
