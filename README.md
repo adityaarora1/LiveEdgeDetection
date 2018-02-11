@@ -45,6 +45,17 @@ dependencies {
     // Other dependencies your app might use
 }
 ```
+# How to use
+```
+1. Start ScanActivity for result from your activity.
+
+startActivityForResult(new Intent(this, ScanActivity.class), REQUEST_CODE);
+
+2. Get a file path for image on onActivityResult.
+
+String filePath = data.getExtras().getString(ScanConstants.SCANNED_RESULT);
+Bitmap baseBitmap = ScanUtils.decodeBitmapFromFile(filePath, ScanConstants.IMAGE_NAME);
+```
 
 # License
 ```
