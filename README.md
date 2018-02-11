@@ -47,13 +47,13 @@ dependencies {
 ```
 # Usage
 Out of the box it uses OpenCV.
+
+1. Start **startActivityForResult** from your activity.
 ```
-1. Start ScanActivity for result from your activity.
-
 startActivityForResult(new Intent(this, ScanActivity.class), REQUEST_CODE);
-
-2. Get a file path for image on onActivityResult.
-
+```
+2. Get a file path for cropped image on **onActivityResult**.
+```
 String filePath = data.getExtras().getString(ScanConstants.SCANNED_RESULT);
 Bitmap baseBitmap = ScanUtils.decodeBitmapFromFile(filePath, ScanConstants.IMAGE_NAME);
 ```
