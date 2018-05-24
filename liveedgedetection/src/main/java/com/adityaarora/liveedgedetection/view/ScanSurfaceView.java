@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -15,6 +16,8 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.FrameLayout;
 
 import com.adityaarora.liveedgedetection.constants.ScanConstants;
 import com.adityaarora.liveedgedetection.enums.ScanHint;
@@ -40,8 +43,9 @@ import static org.opencv.core.CvType.CV_8UC1;
  * This class previews the live images from the camera
  */
 
-public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callback {
     private static final String TAG = ScanSurfaceView.class.getSimpleName();
+    SurfaceView mSurfaceView;
     private final ScanCanvasView scanCanvasView;
 
     private final Context context;
@@ -54,13 +58,16 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private CountDownTimer autoCaptureTimer;
     private int secondsLeft;
     private boolean isAutoCaptureScheduled;
+    private Camera.Size previewSize;
+    private Camera.Size pictureSize;
 
-    public ScanSurfaceView(Context context, ScanCanvasView scanCanvasView,
-                           IScanner iScanner) {
+    public ScanSurfaceView(Context context, ScanCanvasView scanCanvasView, IScanner iScanner) {
         super(context);
+        mSurfaceView = new SurfaceView(context);
+        addView(mSurfaceView);
         this.context = context;
         this.scanCanvasView = scanCanvasView;
-        SurfaceHolder surfaceHolder = getHolder();
+        SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
         surfaceHolder.addCallback(this);
         this.iScanner = iScanner;
     }
@@ -68,10 +75,27 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         try {
+            requestLayout();
             openCamera();
             this.camera.setPreviewDisplay(holder);
             this.camera.startPreview();
             setPreviewCallback();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+    }
+
+    private void openCamera() {
+        if (camera == null) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            int defaultCameraId = 0;
+            for (int i = 0; i < Camera.getNumberOfCameras(); i++) {
+                Camera.getCameraInfo(i, info);
+                if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                    defaultCameraId = i;
+                }
+            }
+            camera = Camera.open(defaultCameraId);
             Camera.Parameters cameraParams = camera.getParameters();
 
             previewSizeList = cameraParams.getSupportedPreviewSizes();
@@ -88,46 +112,33 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 cameraParams.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
             }
 
-            if (cameraParams.getSupportedFocusModes() != null && cameraParams.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+            if (cameraParams.getSupportedFocusModes() != null
+                    && cameraParams.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
                 cameraParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
-            } else if (cameraParams.getSupportedFocusModes() != null && cameraParams.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+            } else if (cameraParams.getSupportedFocusModes() != null
+                    && cameraParams.getSupportedFocusModes().contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
                 cameraParams.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-
             }
 
             camera.setParameters(cameraParams);
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-    }
-
-    private void openCamera() {
-        if(camera == null) {
-            camera = Camera.open();
         }
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        Camera.Size previewSize = ScanUtils.getOptimalPreviewSize(width, height, previewSizeList);
         if (previewSize == null) {
             previewSize = camera.getParameters().getPreviewSize();
         }
-        Camera.Size pictureSize = ScanUtils.determinePictureSize(previewSize, pictureSizeList);
         if (pictureSize == null) {
             pictureSize = camera.getParameters().getPictureSize();
         }
-
-        this.getHolder().setFixedSize(previewSize.height, previewSize.width);
-
-        Camera.Parameters cameraParams = camera.getParameters();
-
+        Camera.Parameters parameters = camera.getParameters();
         camera.setDisplayOrientation(ScanUtils.configureCameraAngle((Activity) context));
-
-        cameraParams.setPreviewSize(previewSize.width, previewSize.height);
-        cameraParams.setPictureSize(pictureSize.width, pictureSize.height);
-
-        camera.setParameters(cameraParams);
+        parameters.setPreviewSize(previewSize.width, previewSize.height);
+        parameters.setPictureSize(pictureSize.width, pictureSize.height);
+        parameters.setPictureFormat(ImageFormat.JPEG);
+        camera.setParameters(parameters);
+        requestLayout();
         camera.startPreview();
     }
 
@@ -178,7 +189,7 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     mat.release();
 
                     if (null != largestQuad) {
-                            drawLargestRect(largestQuad.contour, largestQuad.points, originalPreviewSize, originalPreviewArea);
+                        drawLargestRect(largestQuad.contour, largestQuad.points, originalPreviewSize, originalPreviewArea);
                     } else {
                         showFindingReceiptHint();
                     }
@@ -199,16 +210,16 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         Log.i(TAG, "previewHeight: " + String.valueOf(previewHeight));
 
         //Points are drawn in anticlockwise direction
-        path.moveTo( previewWidth - (float) points[0].y, (float) points[0].x );
-        path.lineTo( previewWidth - (float) points[1].y, (float) points[1].x );
-        path.lineTo( previewWidth - (float) points[2].y, (float) points[2].x );
-        path.lineTo( previewWidth - (float) points[3].y, (float) points[3].x );
+        path.moveTo(previewWidth - (float) points[0].y, (float) points[0].x);
+        path.lineTo(previewWidth - (float) points[1].y, (float) points[1].x);
+        path.lineTo(previewWidth - (float) points[2].y, (float) points[2].x);
+        path.lineTo(previewWidth - (float) points[3].y, (float) points[3].x);
         path.close();
 
         double area = Math.abs(Imgproc.contourArea(approx));
         Log.i(TAG, "Contour Area: " + String.valueOf(area));
 
-        PathShape newBox = new PathShape(path , previewWidth , previewHeight);
+        PathShape newBox = new PathShape(path, previewWidth, previewHeight);
         Paint paint = new Paint();
         Paint border = new Paint();
 
@@ -233,20 +244,20 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         final ScanHint scanHint;
 
-        if(imgDetectionPropsObj.isDetectedAreaBeyondLimits()) {
+        if (imgDetectionPropsObj.isDetectedAreaBeyondLimits()) {
             scanHint = ScanHint.FIND_RECT;
             cancelAutoCapture();
         } else if (imgDetectionPropsObj.isDetectedAreaBelowLimits()) {
             cancelAutoCapture();
-            if(imgDetectionPropsObj.isEdgeTouching()) {
+            if (imgDetectionPropsObj.isEdgeTouching()) {
                 scanHint = ScanHint.MOVE_AWAY;
             } else {
                 scanHint = ScanHint.MOVE_CLOSER;
             }
-        } else if(imgDetectionPropsObj.isDetectedHeightAboveLimit()) {
+        } else if (imgDetectionPropsObj.isDetectedHeightAboveLimit()) {
             cancelAutoCapture();
             scanHint = ScanHint.MOVE_AWAY;
-        } else if(imgDetectionPropsObj.isDetectedWidthAboveLimit() || imgDetectionPropsObj.isDetectedAreaAboveLimit()) {
+        } else if (imgDetectionPropsObj.isDetectedWidthAboveLimit() || imgDetectionPropsObj.isDetectedAreaAboveLimit()) {
             cancelAutoCapture();
             scanHint = ScanHint.MOVE_AWAY;
         } else {
@@ -264,12 +275,12 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 scanHint = ScanHint.CAPTURING_IMAGE;
                 iScanner.clearAndInvalidateCanvas();
 
-                if(!isAutoCaptureScheduled) {
+                if (!isAutoCaptureScheduled) {
                     scheduleAutoCapture(scanHint);
                 }
             }
         }
-        Log.i(TAG,"Preview Area 95%: " + 0.95 * previewArea +
+        Log.i(TAG, "Preview Area 95%: " + 0.95 * previewArea +
                 " Preview Area 20%: " + 0.20 * previewArea +
                 " Area: " + String.valueOf(area) +
                 " Label: " + scanHint.toString());
@@ -308,15 +319,20 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     private void autoCapture(ScanHint scanHint) {
-        if(ScanHint.CAPTURING_IMAGE.equals(scanHint)) {
-            camera.setPreviewCallback(null);
-            camera.takePicture(mShutterCallBack, null, pictureCallback);
-            iScanner.displayHint(ScanHint.NO_MESSAGE);
+        if (ScanHint.CAPTURING_IMAGE.equals(scanHint)) {
+            try {
+                iScanner.displayHint(ScanHint.CAPTURING_IMAGE);
+                camera.setPreviewCallback(null);
+                camera.takePicture(mShutterCallBack, null, pictureCallback);
+                iScanner.displayHint(ScanHint.NO_MESSAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private void cancelAutoCapture() {
-        if(isAutoCaptureScheduled) {
+        if (isAutoCaptureScheduled) {
             isAutoCaptureScheduled = false;
             if (null != autoCaptureTimer) {
                 autoCaptureTimer.cancel();
@@ -337,15 +353,15 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
             case MOVE_CLOSER:
             case MOVE_AWAY:
             case ADJUST_ANGLE:
-                paintColor  = Color.argb(30, 255, 38, 0);
+                paintColor = Color.argb(30, 255, 38, 0);
                 borderColor = Color.rgb(255, 38, 0);
                 break;
             case FIND_RECT:
-                paintColor  = Color.argb(0, 0, 0, 0);
+                paintColor = Color.argb(0, 0, 0, 0);
                 borderColor = Color.argb(0, 0, 0, 0);
                 break;
             case CAPTURING_IMAGE:
-                paintColor  = Color.argb(30, 38, 216, 76);
+                paintColor = Color.argb(30, 38, 216, 76);
                 borderColor = Color.rgb(38, 216, 76);
                 break;
         }
@@ -357,6 +373,7 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private final Camera.PictureCallback pictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
+            iScanner.displayHint(ScanHint.NO_MESSAGE);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
             BitmapFactory.decodeByteArray(data, 0, data.length, options);
@@ -381,9 +398,81 @@ public class ScanSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         public void onShutter() {
             if (context != null) {
                 AudioManager mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-                if(null != mAudioManager)
+                if (null != mAudioManager)
                     mAudioManager.playSoundEffect(AudioManager.FLAG_PLAY_SOUND);
             }
         }
     };
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        // We purposely disregard child measurements because act as a
+        // wrapper to a SurfaceView that centers the camera preview instead
+        // of stretching it.
+        final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+        final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+        setMeasuredDimension(width, height);
+        if (previewSizeList != null)
+            previewSize = ScanUtils.getOptimalPreviewSize(width, height, previewSizeList);
+//          previewSize = ScanUtils.getOptimalPreviewSize(displayOrientation, previewSizeList, width, height);
+        if (pictureSizeList != null)
+            pictureSize = ScanUtils.determinePictureSize(previewSize, pictureSizeList);
+    }
+
+    @SuppressWarnings("SuspiciousNameCombination")
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if (changed && getChildCount() > 0) {
+            final View child = mSurfaceView;
+
+            int width = r - l;
+            int height = b - t;
+
+            int previewWidth = width;
+            int previewHeight = height;
+
+            if (previewSize != null) {
+                previewWidth = previewSize.width;
+                previewHeight = previewSize.height;
+
+                int displayOrientation = ScanUtils.configureCameraAngle((Activity) context);
+                if (displayOrientation == 90 || displayOrientation == 270) {
+                    previewWidth = previewSize.height;
+                    previewHeight = previewSize.width;
+                }
+
+                Log.d(TAG, "previewWidth:" + previewWidth + " previewHeight:" + previewHeight);
+            }
+
+            int nW;
+            int nH;
+            int top;
+            int left;
+
+            float scale = 1.0f;
+
+            // Center the child SurfaceView within the parent.
+            if (width * previewHeight < height * previewWidth) {
+                Log.d(TAG, "center horizontally");
+                int scaledChildWidth = (int) ((previewWidth * height / previewHeight) * scale);
+                nW = (width + scaledChildWidth) / 2;
+                nH = (int) (height * scale);
+                top = 0;
+                left = (width - scaledChildWidth) / 2;
+            } else {
+                Log.d(TAG, "center vertically");
+                int scaledChildHeight = (int) ((previewHeight * width / previewWidth) * scale);
+                nW = (int) (width * scale);
+                nH = (height + scaledChildHeight) / 2;
+                top = (height - scaledChildHeight) / 2;
+                left = 0;
+            }
+            child.layout(left, top, nW, nH);
+
+            Log.d("layout", "left:" + left);
+            Log.d("layout", "top:" + top);
+            Log.d("layout", "right:" + nW);
+            Log.d("layout", "bottom:" + nH);
+        }
+    }
 }

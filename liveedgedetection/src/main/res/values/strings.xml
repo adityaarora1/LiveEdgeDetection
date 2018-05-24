@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Live Edge Detection</string>
-    <string name="camera_activity_permission_denied_toast">Please go to app settings and grant camera permission</string>
+    <string name="camera_activity_permission_denied_toast">Por favor, vá para as configurações do aplicativo e conceda permissão de câmera</string>
 
-    <string name="finding_rect">Use darker background…</string>
-    <string name="move_away">Move away</string>
-    <string name="move_closer">Move closer</string>
-    <string name="adjust_angle">Adjust angle</string>
-    <string name="hold_still">Hold still…</string>
-    <string name="capturing">Capturing image…</string>
+    <string name="finding_rect">Use um fundo mais escuro…</string>
+    <string name="move_away">Afaste</string>
+    <string name="move_closer">Aproxime</string>
+    <string name="adjust_angle">Ajuste o ângulo</string>
+    <string name="hold_still">Segure firme…</string>
+    <string name="capturing">Capturando imagem…</string>
 </resources>

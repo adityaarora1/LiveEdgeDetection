@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.hardware.Camera;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -101,6 +102,82 @@ public class ScanUtils {
         }
         return optimalSize;
     }
+
+    public static int getDisplayOrientation(Activity activity, int cameraId) {
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        DisplayMetrics dm = new DisplayMetrics();
+
+        Camera.getCameraInfo(cameraId, info);
+        activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+
+        int displayOrientation;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            displayOrientation = (info.orientation + degrees) % 360;
+            displayOrientation = (360 - displayOrientation) % 360;
+        } else {
+            displayOrientation = (info.orientation - degrees + 360) % 360;
+        }
+        return displayOrientation;
+    }
+
+    public static Camera.Size getOptimalPreviewSize(int displayOrientation, List<Camera.Size> sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.1;
+        double targetRatio = (double) w / h;
+        if (displayOrientation == 90 || displayOrientation == 270) {
+            targetRatio = (double) h / w;
+        }
+
+        if (sizes == null) {
+            return null;
+        }
+
+        Camera.Size optimalSize = null;
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
+        // Try to find an size match aspect ratio and size
+        for (Camera.Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+
+        // Cannot find the one match the aspect ratio, ignore the requirement
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+
+        Log.d("optimal preview size", "w: " + optimalSize.width + " h: " + optimalSize.height);
+        return optimalSize;
+    }
+
 
     public static int configureCameraAngle(Activity activity) {
         int angle;
