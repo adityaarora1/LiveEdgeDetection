@@ -3,7 +3,6 @@ package com.adityaarora.liveedgedetection.view;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
@@ -33,8 +32,6 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import static org.opencv.core.CvType.CV_8UC1;
@@ -51,15 +48,12 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
     private final Context context;
     private Camera camera;
 
-    private List<Camera.Size> previewSizeList;
-    private List<Camera.Size> pictureSizeList;
-
     private final IScanner iScanner;
     private CountDownTimer autoCaptureTimer;
     private int secondsLeft;
     private boolean isAutoCaptureScheduled;
     private Camera.Size previewSize;
-    private Camera.Size pictureSize;
+    private boolean isCapturing = false;
 
     public ScanSurfaceView(Context context, ScanCanvasView scanCanvasView, IScanner iScanner) {
         super(context);
@@ -98,15 +92,6 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
             camera = Camera.open(defaultCameraId);
             Camera.Parameters cameraParams = camera.getParameters();
 
-            previewSizeList = cameraParams.getSupportedPreviewSizes();
-            pictureSizeList = cameraParams.getSupportedPictureSizes();
-            Collections.sort(pictureSizeList, new Comparator<Camera.Size>() {
-
-                public int compare(final Camera.Size a, final Camera.Size b) {
-                    return b.width * b.height - a.width * a.height;
-                }
-            });
-
             List<String> flashModes = cameraParams.getSupportedFlashModes();
             if (null != flashModes && flashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
                 cameraParams.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
@@ -129,14 +114,9 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         if (previewSize == null) {
             previewSize = camera.getParameters().getPreviewSize();
         }
-        if (pictureSize == null) {
-            pictureSize = camera.getParameters().getPictureSize();
-        }
         Camera.Parameters parameters = camera.getParameters();
         camera.setDisplayOrientation(ScanUtils.configureCameraAngle((Activity) context));
         parameters.setPreviewSize(previewSize.width, previewSize.height);
-        parameters.setPictureSize(pictureSize.width, pictureSize.height);
-        parameters.setPictureFormat(ImageFormat.JPEG);
         camera.setParameters(parameters);
         requestLayout();
         camera.startPreview();
@@ -319,10 +299,19 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
     }
 
     private void autoCapture(ScanHint scanHint) {
+        if (isCapturing) return;
         if (ScanHint.CAPTURING_IMAGE.equals(scanHint)) {
             try {
+                isCapturing = true;
                 iScanner.displayHint(ScanHint.CAPTURING_IMAGE);
                 camera.setPreviewCallback(null);
+
+                Camera.Parameters params = camera.getParameters();
+                Camera.Size size = ScanUtils.determinePictureSize(camera, params.getPreviewSize());
+                params.setPictureSize(size.width, size.height);
+                params.setPictureFormat(ImageFormat.JPEG);
+                camera.setParameters(params);
+
                 camera.takePicture(mShutterCallBack, null, pictureCallback);
                 iScanner.displayHint(ScanHint.NO_MESSAGE);
             } catch (Exception e) {
@@ -374,21 +363,21 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
             iScanner.displayHint(ScanHint.NO_MESSAGE);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeByteArray(data, 0, data.length, options);
 
-            Bitmap bitmap = ScanUtils.loadEfficientBitmap(data,
-                    ScanConstants.LOWER_SAMPLING_THRESHOLD, ScanConstants.HIGHER_SAMPLING_THRESHOLD);
+            Bitmap bitmap = ScanUtils.decodeBitmapFromByteArray(data,
+                    ScanConstants.HIGHER_SAMPLING_THRESHOLD, ScanConstants.HIGHER_SAMPLING_THRESHOLD);
 
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
-            bitmap = Bitmap.createBitmap(bitmap, 0, 0,
-                    bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            bitmap = ScanUtils.resize(bitmap,
-                    ScanConstants.LOWER_SAMPLING_THRESHOLD, ScanConstants.HIGHER_SAMPLING_THRESHOLD);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
             iScanner.onPictureClicked(bitmap);
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    isCapturing = false;
+                }
+            }, 3000);
 
         }
     };
@@ -412,11 +401,7 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
         final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
         setMeasuredDimension(width, height);
-        if (previewSizeList != null)
-            previewSize = ScanUtils.getOptimalPreviewSize(width, height, previewSizeList);
-//          previewSize = ScanUtils.getOptimalPreviewSize(displayOrientation, previewSizeList, width, height);
-        if (pictureSizeList != null)
-            pictureSize = ScanUtils.determinePictureSize(previewSize, pictureSizeList);
+        previewSize = ScanUtils.getOptimalPreviewSize(camera, width, height);
     }
 
     @SuppressWarnings("SuspiciousNameCombination")

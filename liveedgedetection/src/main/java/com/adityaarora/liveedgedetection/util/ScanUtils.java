@@ -51,7 +51,10 @@ public class ScanUtils {
         return Math.abs(left - right) < epsilon;
     }
 
-    public static Camera.Size determinePictureSize(Camera.Size previewSize, Iterable<? extends Camera.Size> pictureSizeList) {
+    public static Camera.Size determinePictureSize(Camera camera, Camera.Size previewSize) {
+        if (camera == null) return null;
+        Camera.Parameters cameraParams = camera.getParameters();
+        List<Camera.Size> pictureSizeList = cameraParams.getSupportedPictureSizes();
         Camera.Size retSize = null;
 
         // if the preview size is not supported as a picture size
@@ -73,11 +76,13 @@ public class ScanUtils {
         return retSize;
     }
 
-    public static Camera.Size getOptimalPreviewSize(int w, int h, Iterable<? extends Camera.Size> previewSizeList) {
+    public static Camera.Size getOptimalPreviewSize(Camera camera, int w, int h) {
+        if (camera == null) return null;
+        Camera.Parameters cameraParams = camera.getParameters();
+        List<Camera.Size> previewSizeList = cameraParams.getSupportedPreviewSizes();
+
         final double ASPECT_TOLERANCE = 0.1;
         double targetRatio = (double) h / w;
-
-        if (previewSizeList == null) return null;
 
         Camera.Size optimalSize = null;
         double minDiff = Double.MAX_VALUE;
@@ -135,6 +140,73 @@ public class ScanUtils {
             displayOrientation = (info.orientation - degrees + 360) % 360;
         }
         return displayOrientation;
+    }
+
+    public static Camera.Size getOptimalPictureSize(Camera camera, final int width, final int height, final Camera.Size previewSize) {
+        if (camera == null) return null;
+        Camera.Parameters cameraParams = camera.getParameters();
+        List<Camera.Size> supportedSizes = cameraParams.getSupportedPictureSizes();
+
+        Camera.Size size = camera.new Size(width, height);
+
+        // convert to landscape if necessary
+        if (size.width < size.height) {
+            int temp = size.width;
+            size.width = size.height;
+            size.height = temp;
+        }
+
+        Camera.Size requestedSize = camera.new Size(size.width, size.height);
+
+        double previewAspectRatio = (double) previewSize.width / (double) previewSize.height;
+
+        if (previewAspectRatio < 1.0) {
+            // reset ratio to landscape
+            previewAspectRatio = 1.0 / previewAspectRatio;
+        }
+
+        Log.d(TAG, "CameraPreview previewAspectRatio " + previewAspectRatio);
+
+        double aspectTolerance = 0.1;
+        double bestDifference = Double.MAX_VALUE;
+
+        for (int i = 0; i < supportedSizes.size(); i++) {
+            Camera.Size supportedSize = supportedSizes.get(i);
+
+            // Perfect match
+            if (supportedSize.equals(requestedSize)) {
+                Log.d(TAG, "CameraPreview optimalPictureSize " + supportedSize.width + 'x' + supportedSize.height);
+                return supportedSize;
+            }
+
+            double difference = Math.abs(previewAspectRatio - ((double) supportedSize.width / (double) supportedSize.height));
+
+            if (difference < bestDifference - aspectTolerance) {
+                // better aspectRatio found
+                if ((width != 0 && height != 0) || (supportedSize.width * supportedSize.height < 2048 * 1024)) {
+                    size.width = supportedSize.width;
+                    size.height = supportedSize.height;
+                    bestDifference = difference;
+                }
+            } else if (difference < bestDifference + aspectTolerance) {
+                // same aspectRatio found (within tolerance)
+                if (width == 0 || height == 0) {
+                    // set highest supported resolution below 2 Megapixel
+                    if ((size.width < supportedSize.width) && (supportedSize.width * supportedSize.height < 2048 * 1024)) {
+                        size.width = supportedSize.width;
+                        size.height = supportedSize.height;
+                    }
+                } else {
+                    // check if this pictureSize closer to requested width and height
+                    if (Math.abs(width * height - supportedSize.width * supportedSize.height) < Math.abs(width * height - size.width * size.height)) {
+                        size.width = supportedSize.width;
+                        size.height = supportedSize.height;
+                    }
+                }
+            }
+        }
+        Log.d(TAG, "CameraPreview optimalPictureSize " + size.width + 'x' + size.height);
+        return size;
     }
 
     public static Camera.Size getOptimalPreviewSize(int displayOrientation, List<Camera.Size> sizes, int w, int h) {
@@ -393,6 +465,37 @@ public class ScanUtils {
         return Math.round(px);
     }
 
+
+    public static Bitmap decodeBitmapFromByteArray(byte[] data, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(data, 0, data.length, options);
+
+        // Calculate inSampleSize
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        options.inSampleSize = inSampleSize;
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeByteArray(data, 0, data.length, options);
+    }
+
+    @Deprecated
     public static Bitmap loadEfficientBitmap(byte[] data, int width, int height) {
         Bitmap bmp;
 
