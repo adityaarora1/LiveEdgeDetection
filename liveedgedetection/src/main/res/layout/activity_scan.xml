@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container_scan"
     android:layout_width="match_parent"
@@ -10,21 +9,13 @@
     <FrameLayout
         android:id="@+id/camera_preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent" />
 
     <com.adityaarora.liveedgedetection.view.ScanCanvasView
         android:id="@+id/scan_canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#00000000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="#00000000" />
 
     <FrameLayout
         android:id="@+id/crop_layout"
@@ -87,13 +78,10 @@
         android:id="@+id/capture_hint_layout"
         android:layout_width="wrap_content"
         android:layout_height="46dp"
+        android:layout_gravity="center"
         android:background="@drawable/hint_white"
         android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/capture_hint_text"
@@ -109,4 +97,4 @@
             android:textColor="@color/white"
             android:textSize="@dimen/text_size_18" />
     </LinearLayout>
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>
