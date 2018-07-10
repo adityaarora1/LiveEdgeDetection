@@ -72,7 +72,6 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
             requestLayout();
             openCamera();
             this.camera.setPreviewDisplay(holder);
-            this.camera.startPreview();
             setPreviewCallback();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
@@ -141,7 +140,8 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         }
     }
 
-    private void setPreviewCallback() {
+    public void setPreviewCallback() {
+        this.camera.startPreview();
         this.camera.setPreviewCallback(previewCallback);
     }
 
@@ -362,6 +362,7 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
     private final Camera.PictureCallback pictureCallback = new Camera.PictureCallback() {
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
+            camera.stopPreview();
             iScanner.displayHint(ScanHint.NO_MESSAGE);
 
             Bitmap bitmap = ScanUtils.decodeBitmapFromByteArray(data,
