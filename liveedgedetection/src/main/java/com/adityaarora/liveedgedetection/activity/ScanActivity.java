@@ -8,15 +8,18 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -57,6 +60,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
 
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 101;
 
+    private ViewGroup containerScan;
     private FrameLayout cameraPreviewLayout;
     private ScanCanvasView scanCanvasView;
     private ScanSurfaceView mImageSurfaceView;
@@ -69,7 +73,8 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
     public final static Stack<PolygonPoints> allDraggedPointsStack = new Stack<>();
     private PolygonView polygonView;
     private ImageView cropImageView;
-    private ImageView cropAcceptBtn;
+    private View cropAcceptBtn;
+    private View cropRejectBtn;
     private Bitmap copyBitmap;
     private FrameLayout cropLayout;
 
@@ -83,6 +88,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
     }
 
     private void init() {
+        containerScan = findViewById(R.id.container_scan);
         cameraPreviewLayout = findViewById(R.id.camera_preview);
         scanCanvasView      = findViewById(R.id.scan_canvas);
         captureHintLayout   = findViewById(R.id.capture_hint_layout);
@@ -90,9 +96,19 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
         polygonView         = findViewById(R.id.polygon_view);
         cropImageView       = findViewById(R.id.crop_image_view);
         cropAcceptBtn       = findViewById(R.id.crop_accept_btn);
+        cropRejectBtn       = findViewById(R.id.crop_reject_btn);
         cropLayout          = findViewById(R.id.crop_layout);
 
         cropAcceptBtn.setOnClickListener(this);
+        cropRejectBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    TransitionManager.beginDelayedTransition(containerScan);
+                cropLayout.setVisibility(View.GONE);
+                mImageSurfaceView.setPreviewCallback();
+            }
+        });
         checkCameraPermissions();
     }
 
@@ -240,6 +256,8 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
                 FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(copyBitmap.getWidth() + 2 * padding, copyBitmap.getHeight() + 2 * padding);
                 layoutParams.gravity = Gravity.CENTER;
                 polygonView.setLayoutParams(layoutParams);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                    TransitionManager.beginDelayedTransition(containerScan);
                 cropLayout.setVisibility(View.VISIBLE);
 
                 cropImageView.setImageBitmap(copyBitmap);

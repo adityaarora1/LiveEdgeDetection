@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="camera_activity_permission_denied_toast">Por favor, vá para as configurações do aplicativo e conceda permissão de câmera</string>
+
+    <string name="finding_rect">Use um fundo mais escuro</string>
+    <string name="move_away">Afaste</string>
+    <string name="move_closer">Aproxime</string>
+    <string name="adjust_angle">Ajuste o ângulo</string>
+    <string name="hold_still">Segure firme</string>
+    <string name="capturing">Capturando imagem</string>
+</resources>
