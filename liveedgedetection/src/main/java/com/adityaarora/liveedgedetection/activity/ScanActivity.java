@@ -36,7 +36,6 @@ import com.adityaarora.liveedgedetection.view.PolygonPoints;
 import com.adityaarora.liveedgedetection.view.PolygonView;
 import com.adityaarora.liveedgedetection.view.ProgressDialogFragment;
 import com.adityaarora.liveedgedetection.view.Quadrilateral;
-import com.adityaarora.liveedgedetection.view.ScanCanvasView;
 import com.adityaarora.liveedgedetection.view.ScanSurfaceView;
 
 import org.opencv.android.Utils;
@@ -62,7 +61,6 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
 
     private ViewGroup containerScan;
     private FrameLayout cameraPreviewLayout;
-    private ScanCanvasView scanCanvasView;
     private ScanSurfaceView mImageSurfaceView;
     private boolean isPermissionNotGranted;
     private static final String mOpenCvLibrary = "opencv_java3";
@@ -90,14 +88,13 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
     private void init() {
         containerScan = findViewById(R.id.container_scan);
         cameraPreviewLayout = findViewById(R.id.camera_preview);
-        scanCanvasView      = findViewById(R.id.scan_canvas);
-        captureHintLayout   = findViewById(R.id.capture_hint_layout);
-        captureHintText     = findViewById(R.id.capture_hint_text);
-        polygonView         = findViewById(R.id.polygon_view);
-        cropImageView       = findViewById(R.id.crop_image_view);
-        cropAcceptBtn       = findViewById(R.id.crop_accept_btn);
-        cropRejectBtn       = findViewById(R.id.crop_reject_btn);
-        cropLayout          = findViewById(R.id.crop_layout);
+        captureHintLayout = findViewById(R.id.capture_hint_layout);
+        captureHintText = findViewById(R.id.capture_hint_text);
+        polygonView = findViewById(R.id.polygon_view);
+        cropImageView = findViewById(R.id.crop_image_view);
+        cropAcceptBtn = findViewById(R.id.crop_accept_btn);
+        cropRejectBtn = findViewById(R.id.crop_reject_btn);
+        cropLayout = findViewById(R.id.crop_layout);
 
         cropAcceptBtn.setOnClickListener(this);
         cropRejectBtn.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +115,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
             isPermissionNotGranted = true;
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     Manifest.permission.CAMERA)) {
-                Toast.makeText(this,"Enable camera permission from settings", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Enable camera permission from settings", Toast.LENGTH_SHORT).show();
             } else {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA},
@@ -126,8 +123,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
             }
         } else {
             if (!isPermissionNotGranted) {
-                mImageSurfaceView = new ScanSurfaceView(ScanActivity.this,
-                        scanCanvasView, this);
+                mImageSurfaceView = new ScanSurfaceView(ScanActivity.this, this);
                 cameraPreviewLayout.addView(mImageSurfaceView);
             } else {
                 isPermissionNotGranted = false;
@@ -156,8 +152,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mImageSurfaceView = new ScanSurfaceView(ScanActivity.this,
-                                    scanCanvasView, ScanActivity.this);
+                            mImageSurfaceView = new ScanSurfaceView(ScanActivity.this, ScanActivity.this);
                             cameraPreviewLayout.addView(mImageSurfaceView);
                         }
                     });
@@ -196,7 +191,6 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
                 break;
             case NO_MESSAGE:
                 captureHintLayout.setVisibility(GONE);
-                clearAndInvalidateCanvas();
                 break;
             default:
                 break;
@@ -204,23 +198,12 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
     }
 
     @Override
-    public void clearAndInvalidateCanvas() {
-        scanCanvasView.clear();
-        invalidateCanvas();
-    }
-
-    @Override
-    public void invalidateCanvas() {
-        scanCanvasView.invalidate();
-    }
-
-    @Override
     public void onPictureClicked(final Bitmap bitmap) {
         try {
             copyBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
 
-            int height  = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getHeight();
-            int width   = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getWidth();
+            int height = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getHeight();
+            int width = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getWidth();
 
             copyBitmap = ScanUtils.resizeToScreenContentSize(copyBitmap, width, height);
             Mat originalMat = new Mat(copyBitmap.getHeight(), copyBitmap.getWidth(), CvType.CV_8UC1);
@@ -232,7 +215,7 @@ public class ScanActivity extends AppCompatActivity implements IScanner, View.On
                 if (null != quad) {
                     double resultArea = Math.abs(Imgproc.contourArea(quad.contour));
                     double previewArea = originalMat.rows() * originalMat.cols();
-                    if(resultArea > previewArea * 0.08) {
+                    if (resultArea > previewArea * 0.08) {
                         points = new ArrayList<>();
                         points.add(new PointF((float) quad.points[0].x, (float) quad.points[0].y));
                         points.add(new PointF((float) quad.points[1].x, (float) quad.points[1].y));

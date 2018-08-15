@@ -10,7 +10,5 @@ import com.adityaarora.liveedgedetection.enums.ScanHint;
 
 public interface IScanner {
     void displayHint(ScanHint scanHint);
-    void clearAndInvalidateCanvas();
-    void invalidateCanvas();
     void onPictureClicked(Bitmap bitmap);
 }
