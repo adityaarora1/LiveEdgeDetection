@@ -46,7 +46,7 @@ import static org.opencv.imgproc.Imgproc.THRESH_OTSU;
 public class ScanUtils {
     private static final String TAG = ScanUtils.class.getSimpleName();
 
-    public static boolean compareFloats(float left, float right) {
+    public static boolean compareFloats(double left, double right) {
         double epsilon = 0.00000001;
         return Math.abs(left - right) < epsilon;
     }
@@ -55,6 +55,14 @@ public class ScanUtils {
         if (camera == null) return null;
         Camera.Parameters cameraParams = camera.getParameters();
         List<Camera.Size> pictureSizeList = cameraParams.getSupportedPictureSizes();
+        Collections.sort(pictureSizeList, new Comparator<Camera.Size>() {
+            @Override
+            public int compare(Camera.Size size1, Camera.Size size2) {
+                Double h1 = Math.sqrt(size1.width * size1.width + size1.height * size1.height);
+                Double h2 = Math.sqrt(size2.width * size2.width + size2.height * size2.height);
+                return h2.compareTo(h1);
+            }
+        });
         Camera.Size retSize = null;
 
         // if the preview size is not supported as a picture size
@@ -78,34 +86,26 @@ public class ScanUtils {
 
     public static Camera.Size getOptimalPreviewSize(Camera camera, int w, int h) {
         if (camera == null) return null;
+        final double targetRatio = (double) h / w;
         Camera.Parameters cameraParams = camera.getParameters();
         List<Camera.Size> previewSizeList = cameraParams.getSupportedPreviewSizes();
-
-        final double ASPECT_TOLERANCE = 0.1;
-        double targetRatio = (double) h / w;
-
-        Camera.Size optimalSize = null;
-        double minDiff = Double.MAX_VALUE;
-
-        for (Camera.Size size : previewSizeList) {
-            double ratio = (double) size.width / size.height;
-            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
-            if (Math.abs(size.height - h) < minDiff) {
-                optimalSize = size;
-                minDiff = Math.abs(size.height - h);
-            }
-        }
-
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE;
-            for (Camera.Size size : previewSizeList) {
-                if (Math.abs(size.height - h) < minDiff) {
-                    optimalSize = size;
-                    minDiff = Math.abs(size.height - h);
+        Collections.sort(previewSizeList, new Comparator<Camera.Size>() {
+            @Override
+            public int compare(Camera.Size size1, Camera.Size size2) {
+                double ratio1 = (double) size1.width / size1.height;
+                double ratio2 = (double) size2.width / size2.height;
+                Double ratioDiff1 = Math.abs(ratio1 - targetRatio);
+                Double ratioDiff2 = Math.abs(ratio2 - targetRatio);
+                if (ScanUtils.compareFloats(ratioDiff1, ratioDiff2)) {
+                    Double h1 = Math.sqrt(size1.width * size1.width + size1.height * size1.height);
+                    Double h2 = Math.sqrt(size2.width * size2.width + size2.height * size2.height);
+                    return h2.compareTo(h1);
                 }
+                return ratioDiff1.compareTo(ratioDiff2);
             }
-        }
-        return optimalSize;
+        });
+
+        return previewSizeList.get(0);
     }
 
     public static int getDisplayOrientation(Activity activity, int cameraId) {
