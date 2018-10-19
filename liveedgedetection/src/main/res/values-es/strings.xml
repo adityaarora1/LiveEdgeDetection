@@ -1,0 +1,10 @@
+<resources>
+    <string name="camera_activity_permission_denied_toast">Por favor, vaya a la configuración de la aplicación y conceda permiso de cámara</string>
+
+    <string name="finding_rect">Usa un fondo más oscuro</string>
+    <string name="move_away">Aléjate</string>
+    <string name="move_closer">Acércate</string>
+    <string name="adjust_angle">Ajusta el ángulo</string>
+    <string name="hold_still">Quédate quieto</string>
+    <string name="capturing">Capturando imagen</string>
+</resources>
