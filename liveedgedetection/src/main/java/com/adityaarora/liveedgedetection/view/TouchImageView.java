@@ -41,7 +41,7 @@ import com.adityaarora.liveedgedetection.util.ScanUtils;
 /**
  * This class provides pinch to zoom capability to an image
  */
-public class TouchImageView extends android.support.v7.widget.AppCompatImageView {
+public class TouchImageView extends androidx.appcompat.widget.AppCompatImageView {
 	
 	private static final String DEBUG = "DEBUG";
 	
