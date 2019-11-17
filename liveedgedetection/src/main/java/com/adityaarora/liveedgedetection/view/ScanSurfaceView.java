@@ -74,7 +74,6 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
             requestLayout();
             openCamera();
             this.camera.setPreviewDisplay(holder);
-            setPreviewCallback();
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
         }

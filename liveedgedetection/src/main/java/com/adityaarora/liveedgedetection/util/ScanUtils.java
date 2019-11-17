@@ -14,14 +14,18 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.Surface;
 
+import com.adityaarora.liveedgedetection.constants.ScanConstants;
 import com.adityaarora.liveedgedetection.view.Quadrilateral;
 
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
@@ -276,19 +280,7 @@ public class ScanUtils {
         return angle;
     }
 
-    public static Quadrilateral detectLargestQuadrilateral(Mat mat) {
-        Mat mGrayMat = new Mat(mat.rows(), mat.cols(), CV_8UC1);
-        Imgproc.cvtColor(mat, mGrayMat, Imgproc.COLOR_BGR2GRAY, 4);
-        Imgproc.threshold(mGrayMat, mGrayMat, 150, 255, THRESH_BINARY + THRESH_OTSU);
 
-        List<MatOfPoint> largestContour = findLargestContour(mGrayMat);
-        if (null != largestContour) {
-            Quadrilateral mLargestRect = findQuadrilateral(largestContour);
-            if (mLargestRect != null)
-                return mLargestRect;
-        }
-        return null;
-    }
 
     public static double getMaxCosine(double maxCosine, Point[] approxPoints) {
         Log.i(TAG, "ANGLES ARE:");
@@ -339,24 +331,86 @@ public class ScanUtils {
         return result;
     }
 
-    private static List<MatOfPoint> findLargestContour(Mat inputMat) {
+    private static Mat morph_kernel = new Mat(new Size(ScanConstants.KSIZE_CLOSE, ScanConstants.KSIZE_CLOSE), CvType.CV_8UC1, new Scalar(255));
+
+    public static Quadrilateral detectLargestQuadrilateral(Mat originalMat) {
+        Imgproc.cvtColor(originalMat, originalMat, Imgproc.COLOR_BGR2GRAY, 4);
+
+        // Just OTSU/Binary thresholding is not enough.
+        //Imgproc.threshold(mGrayMat, mGrayMat, 150, 255, THRESH_BINARY + THRESH_OTSU);
+
+        /*
+        *  1. We shall first blur and normalize the image for uniformity,
+        *  2. Truncate light-gray to white and normalize,
+        *  3. Apply canny edge detection,
+        *  4. Cutoff weak edges,
+        *  5. Apply closing(morphology), then proceed to finding contours.
+        */
+
+        // step 1.
+        Imgproc.blur(originalMat, originalMat, new Size(ScanConstants.KSIZE_BLUR, ScanConstants.KSIZE_BLUR));
+        Core.normalize(originalMat, originalMat, 0, 255, Core.NORM_MINMAX);
+        // step 2.
+        // As most papers are bright in color, we can use truncation to make it uniformly bright.
+        Imgproc.threshold(originalMat,originalMat, ScanConstants.TRUNC_THRESH,255,Imgproc.THRESH_TRUNC);
+        Core.normalize(originalMat, originalMat, 0, 255, Core.NORM_MINMAX);
+        // step 3.
+        // After above preprocessing, canny edge detection can now work much better.
+        Imgproc.Canny(originalMat, originalMat, ScanConstants.CANNY_THRESH_U, ScanConstants.CANNY_THRESH_L);
+        // step 4.
+        // Cutoff the remaining weak edges
+        Imgproc.threshold(originalMat,originalMat,ScanConstants.CUTOFF_THRESH,255,Imgproc.THRESH_TOZERO);
+        // step 5.
+        // Closing - closes small gaps. Completes the edges on canny image; AND also reduces stringy lines near edge of paper.
+        Imgproc.morphologyEx(originalMat, originalMat, Imgproc.MORPH_CLOSE, morph_kernel, new Point(-1,-1),1);
+
+        // Get only the 10 largest contours (each approximated to their convex hulls)
+        List<MatOfPoint> largestContour = findLargestContours(originalMat, 10);
+        if (null != largestContour) {
+            Quadrilateral mLargestRect = findQuadrilateral(largestContour);
+            if (mLargestRect != null)
+                return mLargestRect;
+        }
+        return null;
+    }
+    private static MatOfPoint hull2Points(MatOfInt hull, MatOfPoint contour) {
+        List<Integer> indexes = hull.toList();
+        List<Point> points = new ArrayList<>();
+        List<Point> ctrList = contour.toList();
+        for(Integer index:indexes) {
+            points.add(ctrList.get(index));
+        }
+        MatOfPoint point= new MatOfPoint();
+        point.fromList(points);
+        return point;
+    }
+    private static List<MatOfPoint> findLargestContours(Mat inputMat, int NUM_TOP_CONTOURS) {
         Mat mHierarchy = new Mat();
         List<MatOfPoint> mContourList = new ArrayList<>();
-        //finding contours
-        Imgproc.findContours(inputMat, mContourList, mHierarchy, Imgproc.RETR_EXTERNAL,
-                Imgproc.CHAIN_APPROX_SIMPLE);
+        //finding contours - as we are sorting by area anyway, we can use RETR_LIST - faster than RETR_EXTERNAL.
+        Imgproc.findContours(inputMat, mContourList, mHierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        Mat mContoursMat = new Mat();
-        mContoursMat.create(inputMat.rows(), inputMat.cols(), CvType.CV_8U);
+        // Convert the contours to their Convex Hulls i.e. removes minor nuances in the contour
+        List<MatOfPoint> mHullList = new ArrayList<>();
+        MatOfInt tempHullIndices = new MatOfInt();
+        for (int i = 0; i < mContourList.size(); i++) {
+            Imgproc.convexHull(mContourList.get(i), tempHullIndices);
+            mHullList.add(hull2Points(tempHullIndices, mContourList.get(i)));
+        }
+        // Release mContourList as its job is done
+        for (MatOfPoint c : mContourList)
+            c.release();
+        tempHullIndices.release();
+        mHierarchy.release();
 
-        if (mContourList.size() != 0) {
-            Collections.sort(mContourList, new Comparator<MatOfPoint>() {
+        if (mHullList.size() != 0) {
+            Collections.sort(mHullList, new Comparator<MatOfPoint>() {
                 @Override
                 public int compare(MatOfPoint lhs, MatOfPoint rhs) {
-                    return Double.valueOf(Imgproc.contourArea(rhs)).compareTo(Imgproc.contourArea(lhs));
+                    return Double.compare(Imgproc.contourArea(rhs),Imgproc.contourArea(lhs));
                 }
             });
-            return mContourList;
+            return mHullList.subList(0, Math.min(mHullList.size(), NUM_TOP_CONTOURS));
         }
         return null;
     }
