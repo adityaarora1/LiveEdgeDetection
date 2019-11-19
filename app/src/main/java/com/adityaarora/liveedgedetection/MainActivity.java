@@ -4,12 +4,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.adityaarora.liveedgedetection.activity.ScanActivity;
 import com.adityaarora.liveedgedetection.constants.ScanConstants;
 import com.adityaarora.liveedgedetection.util.ScanUtils;
+
+import info.hannes.crashlytic.CrashlyticsTree;
+import info.hannes.timber.DebugTree;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,6 +25,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (BuildConfig.DEBUG)
+            Timber.plant(new DebugTree());
+        else
+            Timber.plant(new CrashlyticsTree());
+
         scannedImageView = findViewById(R.id.scanned_image);
         startScan();
     }
