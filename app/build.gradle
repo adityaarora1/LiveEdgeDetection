@@ -9,7 +9,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.adityaarora.liveedgedetection"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 29
         versionCode getGitCommitCount()
         versionName getTag()
