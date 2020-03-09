@@ -6,9 +6,9 @@ jdk:
 git:
   depth: false
 
-#branches:
-#  only:
-#    - master
+branches:
+  only:
+    - master
 
 install:
 - yes | sdkmanager --verbose "build-tools;28.0.3"
