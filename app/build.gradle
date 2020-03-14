@@ -16,6 +16,8 @@ android {
         versionCode getGitCommitCount()
         versionName getTag()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", 'GIT_USER', "\"" + getGitUser() + "\""
+        buildConfigField "String", 'GIT_REPOSITORY', "\"" + getGitRepository() + "\""
     }
 
     compileOptions {
@@ -81,6 +83,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation project(':liveedgedetection')
     implementation 'com.github.hannesa2:Logcat:1.7.0'
+    implementation 'com.github.hannesa2:githubAppUpdate:0.5'
 
     implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
@@ -108,6 +111,24 @@ def setOutputFileName(variant, callerProject) {
     variant.outputs.all {
         outputFileName = new File(".", newName)
     }
+}
+
+static def getGitOriginRemote() {
+    def process = "git remote -v".execute()
+    def values = process.text.toString().trim().split("\\r\\n|\\n|\\r")
+
+    def found = values.find { it.startsWith("origin") && it.endsWith("(push)") }
+    return found.replace("origin", "").replace("(push)", "").replace(".git", "").trim()
+}
+
+static def getGitUser() {
+        def token = getGitOriginRemote().split("/")
+    return token[3]
+}
+
+static def getGitRepository() {
+    def token = getGitOriginRemote().split("/")
+    return token[4]
 }
 
 static def getGitCommitCount() {

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.adityaarora.liveedgedetection.activity.ScanActivity
 import com.adityaarora.liveedgedetection.constants.ScanConstants
 import com.adityaarora.liveedgedetection.util.ScanUtils
+import info.hannes.github.AppUpdateHelper
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +19,13 @@ class MainActivity : AppCompatActivity() {
 
         // let's see if Crashlytics can catch the error now
         Handler().postDelayed({ startScan() }, 2000)
+
+        AppUpdateHelper.checkForNewVersion(
+                MainActivity@ this,
+                BuildConfig.GIT_USER,
+                BuildConfig.GIT_REPOSITORY,
+                BuildConfig.VERSION_NAME
+        )
     }
 
     private fun startScan() {
