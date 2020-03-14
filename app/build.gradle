@@ -3,6 +3,8 @@ import org.gradle.internal.logging.text.StyledTextOutputFactory
 import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'io.fabric'
 
 android {
@@ -82,6 +84,8 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-analytics:17.2.3'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+    implementation "androidx.core:core-ktx:1.2.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 def setOutputFileName(variant, callerProject) {
