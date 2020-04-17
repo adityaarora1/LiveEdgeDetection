@@ -9,6 +9,7 @@ apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 29
+    ndkVersion "21.0.6113669"
     defaultConfig {
         applicationId "com.adityaarora.liveedgedetection"
         minSdkVersion 21
