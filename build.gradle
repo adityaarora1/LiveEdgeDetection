@@ -25,7 +25,7 @@ ext {
 
     ndkSelectedVersion = properties.getProperty("ndkVersion")
     if (ndkSelectedVersion == null)
-        ndkSelectedVersion = "21.0.6113669" // default of CI
+        ndkSelectedVersion = "21.2.6472646" // default of CI
 
     println "ndkSelectedVersion=$ndkSelectedVersion"
 }
