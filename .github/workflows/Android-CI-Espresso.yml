@@ -22,17 +22,12 @@ jobs:
         run: brew install coreutils
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Check Gradle checksum
-        run: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ZacSweers/check-gradle-checksums/master/check-gradle-checksums.sh)"
       - name: Install JDK ${{ matrix.java_version }}
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java_version }}
       - name: Install Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.0.5
-      - name: Configure Gradle
-        # Initial gradle configuration, install dependencies, etc
-        run: ./gradlew help
       - name: Decrypt keystore
         run: ./signing/decrypt.sh
         env:
@@ -46,7 +41,6 @@ jobs:
           ALIAS_PASS: ${{ secrets.ALIAS_PASS }}
       - name: cleanup keystore
         run: ./signing/cleanup.sh
-      # TODO split test and instrumentation into parallel builds
       - name: Run tests
         run: ./gradlew test --stacktrace
       - name: Run instrumentation tests
@@ -61,9 +55,7 @@ jobs:
         with:
           name: Espresso-report
           path: app/build/reports/androidTests/connected
-      - name: Reclaim memory
-        run: ./gradlew --stop && jps|grep -E 'KotlinCompileDaemon|GradleDaemon'| awk '{print $1}'| xargs kill -9
-      - name: Final checks
+      - name: Code checks
         run: ./gradlew check --stacktrace
       - name: Archive Lint report
         uses: actions/upload-artifact@v1
