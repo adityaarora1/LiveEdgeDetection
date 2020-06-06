@@ -1,4 +1,4 @@
-package info.liveedgedetection.test;
+package info.hannes.liveedgedetection.demo;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
