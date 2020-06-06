@@ -75,6 +75,7 @@ jobs:
         run: ./gradlew check --stacktrace
       - name: Archive Lint report
         uses: actions/upload-artifact@v1
+        if: ${{ always() }}
         with:
           name: Lint-report
           path: app/build/reports/lint-results.html
