@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.enums;
+package info.hannes.liveedgedetection;
 
 /**
  * Enum that defines receipt detection messages

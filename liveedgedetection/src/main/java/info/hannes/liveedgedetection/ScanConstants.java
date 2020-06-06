@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.constants;
+package info.hannes.liveedgedetection;
 
 /**
  * This class defines constants

@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.activity;
+package info.hannes.liveedgedetection.activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -28,17 +28,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.adityaarora.liveedgedetection.R;
-import com.adityaarora.liveedgedetection.constants.ScanConstants;
-import com.adityaarora.liveedgedetection.enums.ScanHint;
-import com.adityaarora.liveedgedetection.interfaces.IScanner;
-import com.adityaarora.liveedgedetection.util.ScanUtils;
-import com.adityaarora.liveedgedetection.view.PolygonPoints;
-import com.adityaarora.liveedgedetection.view.PolygonView;
-import com.adityaarora.liveedgedetection.view.ProgressDialogFragment;
-import com.adityaarora.liveedgedetection.view.Quadrilateral;
-import com.adityaarora.liveedgedetection.view.ScanSurfaceView;
-
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -49,6 +38,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+
+import info.hannes.liveedgedetection.IScanner;
+import info.hannes.liveedgedetection.PolygonPoints;
+import info.hannes.liveedgedetection.R;
+import info.hannes.liveedgedetection.ScanConstants;
+import info.hannes.liveedgedetection.ScanHint;
+import info.hannes.liveedgedetection.ScanUtils;
+import info.hannes.liveedgedetection.view.PolygonView;
+import info.hannes.liveedgedetection.view.ProgressDialogFragment;
+import info.hannes.liveedgedetection.view.Quadrilateral;
+import info.hannes.liveedgedetection.view.ScanSurfaceView;
 
 import static android.view.View.GONE;
 

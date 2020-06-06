@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection;
+package info.hannes.liveedgedetection;
 
 import org.junit.Test;
 

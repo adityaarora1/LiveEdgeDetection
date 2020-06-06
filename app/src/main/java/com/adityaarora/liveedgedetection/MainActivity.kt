@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.os.Handler
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.adityaarora.liveedgedetection.activity.ScanActivity
-import com.adityaarora.liveedgedetection.constants.ScanConstants
-import com.adityaarora.liveedgedetection.util.ScanUtils
 import info.hannes.github.AppUpdateHelper
+import info.hannes.liveedgedetection.ScanConstants
+import info.hannes.liveedgedetection.ScanUtils
+import info.hannes.liveedgedetection.activity.ScanActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {

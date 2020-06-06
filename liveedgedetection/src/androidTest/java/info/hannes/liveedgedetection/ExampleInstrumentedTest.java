@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection;
+package info.hannes.liveedgedetection;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;

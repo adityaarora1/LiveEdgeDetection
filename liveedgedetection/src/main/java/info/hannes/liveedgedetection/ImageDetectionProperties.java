@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.util;
+package info.hannes.liveedgedetection;
 
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;

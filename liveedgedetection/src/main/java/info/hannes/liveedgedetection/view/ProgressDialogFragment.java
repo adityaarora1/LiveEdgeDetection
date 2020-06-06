@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.view;
+package info.hannes.liveedgedetection.view;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;

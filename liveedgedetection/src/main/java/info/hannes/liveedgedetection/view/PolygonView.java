@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.view;
+package info.hannes.liveedgedetection.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -13,14 +13,15 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import com.adityaarora.liveedgedetection.R;
-import com.adityaarora.liveedgedetection.activity.ScanActivity;
-import com.adityaarora.liveedgedetection.util.ScanUtils;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import info.hannes.liveedgedetection.PolygonPoints;
+import info.hannes.liveedgedetection.R;
+import info.hannes.liveedgedetection.ScanUtils;
+import info.hannes.liveedgedetection.activity.ScanActivity;
 
 /**
  * This class defines polygon for cropping
@@ -367,7 +368,7 @@ public class PolygonView extends FrameLayout {
                     latestPoint2 = new PointF(mainPointer2.getX(), mainPointer2.getY());
                     break;
                 case MotionEvent.ACTION_UP:
-                    int color = 0;
+                    int color;
                     if (isValidShape(getPoints()) && isValidPointer1() && isValidPointer2() && isValidPointer3() && isValidPointer4()) {
                         color = getResources().getColor(R.color.crop_color);
                         latestPoint.x = v.getX();
@@ -458,7 +459,7 @@ public class PolygonView extends FrameLayout {
                     latestPoint = new PointF(v.getX(), v.getY());
                     break;
                 case MotionEvent.ACTION_UP:
-                    int color = 0;
+                    int color;
                     if (isValidShape(getPoints()) && isValidPointer4() && isValidPointer3() && isValidPointer2() && isValidPointer1()) {
                         color = getResources().getColor(R.color.crop_color);
                         latestPoint.x = v.getX();

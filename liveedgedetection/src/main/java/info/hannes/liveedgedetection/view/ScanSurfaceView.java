@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.view;
+package info.hannes.liveedgedetection.view;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,12 +17,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
-import com.adityaarora.liveedgedetection.constants.ScanConstants;
-import com.adityaarora.liveedgedetection.enums.ScanHint;
-import com.adityaarora.liveedgedetection.interfaces.IScanner;
-import com.adityaarora.liveedgedetection.util.ImageDetectionProperties;
-import com.adityaarora.liveedgedetection.util.ScanUtils;
-
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
@@ -33,6 +27,12 @@ import org.opencv.imgproc.Imgproc;
 import java.io.IOException;
 import java.util.List;
 
+import info.hannes.liveedgedetection.IScanner;
+import info.hannes.liveedgedetection.ImageDetectionProperties;
+import info.hannes.liveedgedetection.ScanConstants;
+import info.hannes.liveedgedetection.ScanHint;
+import info.hannes.liveedgedetection.ScanUtils;
+
 import static org.opencv.core.CvType.CV_8UC1;
 
 /**
@@ -42,7 +42,7 @@ import static org.opencv.core.CvType.CV_8UC1;
 public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callback {
     private static final String TAG = ScanSurfaceView.class.getSimpleName();
     SurfaceView mSurfaceView;
-    private final ScanCanvasView scanCanvasView;
+    private final info.hannes.liveedgedetection.view.ScanCanvasView scanCanvasView;
     private int vWidth = 0;
     private int vHeight = 0;
 
@@ -61,7 +61,7 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         mSurfaceView = new SurfaceView(context);
         addView(mSurfaceView);
         this.context = context;
-        this.scanCanvasView = new ScanCanvasView(context);
+        this.scanCanvasView = new info.hannes.liveedgedetection.view.ScanCanvasView(context);
         addView(scanCanvasView);
         SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
         surfaceHolder.addCallback(this);
@@ -179,7 +179,7 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
                     Size originalPreviewSize = mat.size();
                     int originalPreviewArea = mat.rows() * mat.cols();
 
-                    Quadrilateral largestQuad = ScanUtils.detectLargestQuadrilateral(mat);
+                    info.hannes.liveedgedetection.view.Quadrilateral largestQuad = ScanUtils.detectLargestQuadrilateral(mat);
                     clearAndInvalidateCanvas();
 
                     mat.release();
@@ -202,8 +202,8 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         float previewWidth = (float) stdSize.height;
         float previewHeight = (float) stdSize.width;
 
-        Log.i(TAG, "previewWidth: " + String.valueOf(previewWidth));
-        Log.i(TAG, "previewHeight: " + String.valueOf(previewHeight));
+        Log.i(TAG, "previewWidth: " + previewWidth);
+        Log.i(TAG, "previewHeight: " + previewHeight);
 
         //Points are drawn in anticlockwise direction
         path.moveTo(previewWidth - (float) points[0].y, (float) points[0].x);
@@ -213,7 +213,7 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         path.close();
 
         double area = Math.abs(Imgproc.contourArea(approx));
-        Log.i(TAG, "Contour Area: " + String.valueOf(area));
+        Log.i(TAG, "Contour Area: " + area);
 
         PathShape newBox = new PathShape(path, previewWidth, previewHeight);
         Paint paint = new Paint();
@@ -231,8 +231,8 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         if (bottomWidth > resultWidth)
             resultWidth = bottomWidth;
 
-        Log.i(TAG, "resultWidth: " + String.valueOf(resultWidth));
-        Log.i(TAG, "resultHeight: " + String.valueOf(resultHeight));
+        Log.i(TAG, "resultWidth: " + resultWidth);
+        Log.i(TAG, "resultHeight: " + resultHeight);
 
         ImageDetectionProperties imgDetectionPropsObj
                 = new ImageDetectionProperties(previewWidth, previewHeight, resultWidth, resultHeight,
@@ -278,7 +278,7 @@ public class ScanSurfaceView extends FrameLayout implements SurfaceHolder.Callba
         }
         Log.i(TAG, "Preview Area 95%: " + 0.95 * previewArea +
                 " Preview Area 20%: " + 0.20 * previewArea +
-                " Area: " + String.valueOf(area) +
+                " Area: " + area +
                 " Label: " + scanHint.toString());
 
         border.setStrokeWidth(12);

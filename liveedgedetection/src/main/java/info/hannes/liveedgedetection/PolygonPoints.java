@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.view;
+package info.hannes.liveedgedetection;
 
 import android.graphics.PointF;
 

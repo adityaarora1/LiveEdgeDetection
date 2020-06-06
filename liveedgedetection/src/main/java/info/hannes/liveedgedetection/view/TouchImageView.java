@@ -10,7 +10,7 @@
  * Extends Android ImageView to include pinch zooming, panning, fling and double tap zoom.
  */
 
-package com.adityaarora.liveedgedetection.view;
+package info.hannes.liveedgedetection.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -36,7 +36,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
-import com.adityaarora.liveedgedetection.util.ScanUtils;
+import info.hannes.liveedgedetection.ScanUtils;
 
 /**
  * This class provides pinch to zoom capability to an image

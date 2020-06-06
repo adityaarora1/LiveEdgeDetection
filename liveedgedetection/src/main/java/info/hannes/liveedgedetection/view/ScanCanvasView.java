@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.view;
+package info.hannes.liveedgedetection.view;
 
 import android.content.Context;
 import android.graphics.Canvas;

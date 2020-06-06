@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection.util;
+package info.hannes.liveedgedetection;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,9 +13,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Surface;
-
-import com.adityaarora.liveedgedetection.constants.ScanConstants;
-import com.adityaarora.liveedgedetection.view.Quadrilateral;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -38,6 +35,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
+import info.hannes.liveedgedetection.view.Quadrilateral;
 
 import static org.opencv.core.CvType.CV_8UC1;
 import static org.opencv.imgproc.Imgproc.THRESH_BINARY;

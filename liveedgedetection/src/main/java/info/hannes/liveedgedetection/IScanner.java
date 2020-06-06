@@ -1,8 +1,6 @@
-package com.adityaarora.liveedgedetection.interfaces;
+package info.hannes.liveedgedetection;
 
 import android.graphics.Bitmap;
-
-import com.adityaarora.liveedgedetection.enums.ScanHint;
 
 /**
  * Interface between activity and surface view
