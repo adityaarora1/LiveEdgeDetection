@@ -6,18 +6,15 @@ LiveEdgeDetection is an Android document detection library built on top of OpenC
 
 **It works best with a dark background.**
 
-# Download apk
-Try the [sample app](https://drive.google.com/file/d/1sO26O4-1-2XAX16czREx7SiiCD8-4ecU/view?usp=sharing)
-
 # Screenshots
 
-![Use darker bg](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/use_darker_bg.png)
-![Move closer](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/move_closer.png)
-![Move away](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/move_away.png)
-![Adjust angle](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/adjust_angle.png)
-![Hold still](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/hold_still.png)
-![Adjust crop](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/adjust_crop.png)
-![Result](https://github.com/adityaarora1/LiveEdgeDetection/blob/master/cropped.png)
+![Use darker bg](https://github.com/hannesa2/LiveEdgeDetection/blob/master/use_darker_bg.png)
+![Move closer](https://github.com/hannesa2/LiveEdgeDetection/blob/master/move_closer.png)
+![Move away](https://github.com/hannesa2/LiveEdgeDetection/blob/master/move_away.png)
+![Adjust angle](https://github.com/hannesa2/LiveEdgeDetection/blob/master/adjust_angle.png)
+![Hold still](https://github.com/hannesa2/LiveEdgeDetection/blob/master/hold_still.png)
+![Adjust crop](https://github.com/hannesa2/LiveEdgeDetection/blob/master/adjust_crop.png)
+![Result](https://github.com/hannesa2/LiveEdgeDetection/blob/master/cropped.png)
 
 # Integrating into your project
 This library is available in [JitPack.io](https://jitpack.io/) repository.
@@ -36,9 +33,7 @@ and add the repository's url to the app's build.gradle file.
 
 ```
 dependencies {
-   compile 'com.github.adityaarora1:LiveEdgeDetection:1.0.6.7'
-   
-    // Other dependencies your app might use
+   implementation 'com.github.hannesa2:LiveEdgeDetection:1.0.6.7'
 }
 ```
 # Usage
@@ -55,7 +50,7 @@ Bitmap baseBitmap = ScanUtils.decodeBitmapFromFile(filePath, ScanConstants.IMAGE
 ```
 3. Display the image using **TouchImageView**
 ```
-<com.adityaarora.liveedgedetection.view.TouchImageView
+<info.hannes.liveedgedetection.view.TouchImageView
         android:id="@+id/scanned_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
