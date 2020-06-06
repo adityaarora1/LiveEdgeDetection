@@ -1,14 +1,10 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.github.dcendents.android-maven'
 
-group = 'com.github.adityaarora1'
 android {
     compileSdkVersion 29
     ndkVersion ndkSelectedVersion
-    packageBuildConfig false
-
 
     defaultConfig {
         minSdkVersion 16
