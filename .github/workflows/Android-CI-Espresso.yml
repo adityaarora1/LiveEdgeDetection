@@ -1,4 +1,4 @@
-name: CI
+name: PullRequest
 
 on:
   push:
@@ -55,7 +55,7 @@ jobs:
       - name: Archive Espresso results
         uses: actions/upload-artifact@v1
         with:
-          name: Espresso-report
+          name: LiveEdgeDetection-Espresso-report
           path: app/build/reports/androidTests/connected
   Check:
     name: Check
@@ -77,5 +77,5 @@ jobs:
         uses: actions/upload-artifact@v1
         if: ${{ always() }}
         with:
-          name: Lint-report
+          name: LiveEdgeDetection-Lint-report
           path: app/build/reports/lint-results.html
