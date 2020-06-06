@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection
+package info.hannes.liveedgedetection.demo
 
 import android.app.Activity
 import android.content.Intent

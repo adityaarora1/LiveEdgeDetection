@@ -1,4 +1,4 @@
-package com.adityaarora.liveedgedetection
+package info.hannes.liveedgedetection.demo
 
 import android.app.Application
 import info.hannes.crashlytic.CrashlyticsTree
@@ -9,6 +9,7 @@ class DetectApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(DebugTree())
-        if (!BuildConfig.DEBUG) Timber.plant(CrashlyticsTree())
+        if (!BuildConfig.DEBUG)
+            Timber.plant(CrashlyticsTree())
     }
 }

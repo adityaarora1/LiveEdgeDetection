@@ -16,6 +16,6 @@ public class PackageTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.adityaarora.liveedgedetection", appContext.getPackageName());
+        assertEquals("info.hannes.liveedgedetection.demo", appContext.getPackageName());
     }
 }
