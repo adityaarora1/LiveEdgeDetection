@@ -97,7 +97,7 @@ def setOutputFileName(variant, callerProject) {
 
     def originalFile = variant.outputs[0].outputFile
     def originalName = originalFile.name
-    println "originalName is $originalName"
+    println "originalName=$originalName variant.name=$variant.name"
 
     def newName = "LiveEdgeDetection"
 
