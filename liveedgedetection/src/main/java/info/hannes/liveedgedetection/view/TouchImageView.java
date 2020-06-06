@@ -36,12 +36,14 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+import androidx.appcompat.widget.AppCompatImageView;
+
 import info.hannes.liveedgedetection.ScanUtils;
 
 /**
  * This class provides pinch to zoom capability to an image
  */
-public class TouchImageView extends androidx.appcompat.widget.AppCompatImageView {
+public class TouchImageView extends AppCompatImageView {
 	
 	private static final String DEBUG = "DEBUG";
 	
